@@ -1,0 +1,23 @@
+app_env: simulation
+app_name: Q-SHIELD Orchestrator
+version: 0.1.0
+
+database:
+  url: sqlite:///./qshield.db
+  echo: false
+
+logging:
+  level: INFO
+  format: text
+  redact_keys:
+    - password
+    - secret
+    - token
+    - key_material
+    - private_key
+    - api_key
+    - secret_audit_salt
+
+api:
+  host: 0.0.0.0
+  port: 8000

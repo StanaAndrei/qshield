@@ -22,22 +22,22 @@ Every milestone terminates with an **Explicit Milestone Verification Interlude**
 
 ## Milestone 0: Inception, Environment & Tooling
 
-- [ ] **TASK-0.1** (Agent A) — Project Packaging & Dependencies
+- [x] **TASK-0.1** (Agent A) — Project Packaging & Dependencies
   - **Files**: `pyproject.toml`, `.gitignore`, `.env.example`
   - **Description**: Configure packaging for Python 3.11+, pinning `fastapi`, `uvicorn`, `pydantic>=2.0`, `sqlalchemy>=2.0`, `simpy`, `scikit-learn`, `joblib`, `streamlit`, `pytest`, `pytest-asyncio`, `httpx`, `ruff`, `mypy`. Setup `.gitignore` and `.env.example`.
   - **DoD**: `pip install -e ".[dev]"` succeeds without dependency conflicts.
 
-- [ ] **TASK-0.2** (Agent A) — Global Configuration & Logging Setup
+- [x] **TASK-0.2** (Agent A) — Global Configuration & Logging Setup
   - **Files**: `app/core/config.py`, `configs/app.yaml`
   - **Description**: Implement `Settings` using Pydantic Settings reading environment variables with fallback to `configs/app.yaml`. Configure structured logging that redacts passwords, tokens, and keys.
   - **DoD**: `python -c "from app.core.config import settings; print(settings.APP_ENV)"` outputs `simulation`.
 
-- [ ] **TASK-0.3** (Agent G) — Pytest Test Harness & Mock Repositories
+- [x] **TASK-0.3** (Agent G) — Pytest Test Harness & Mock Repositories
   - **Files**: `tests/conftest.py`, `tests/fixtures/mock_repository.py`
   - **Description**: Implement shared Pytest fixtures: in-memory SQLite engine, thread-safe `InMemoryTransferRepository`, mock telemetry generator, and FastAPI test client.
   - **DoD**: `pytest --collect-only` executes and discovers fixtures without errors.
 
-- [ ] **TASK-0.4** (Agent G) — Static Linter & Type Check Setup
+- [x] **TASK-0.4** (Agent G) — Static Linter & Type Check Setup
   - **Files**: `pyproject.toml` (ruff and mypy sections)
   - **Description**: Configure strict Ruff linting and Mypy static type checking across `app` and `tests`.
   - **DoD**: `ruff check .` and `mypy app tests` run cleanly with zero errors.

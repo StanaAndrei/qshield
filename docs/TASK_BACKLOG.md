@@ -54,27 +54,27 @@ pytest --collect-only
 
 ## Milestone 1: Minimal Working Tracer Bullet
 
-- [ ] **TASK-1.1** (Agent A) — Core Enums, State Machine & Domain Exceptions
+- [x] **TASK-1.1** (Agent A) — Core Enums, State Machine & Domain Exceptions
   - **Files**: `app/core/enums.py`, `app/core/exceptions.py`, `app/core/state_machine.py`
   - **Description**: Implement `PriorityLevel`, `TransferStatus`, `DataCategory`, `SecurityProfile`. Build the `TransferStateMachine` class enforcing the deterministic lifecycle transitions specified in `docs/ARCHITECTURE_CONTRACTS.md`.
   - **DoD**: Invalid state transitions (e.g. `COMPLETED -> QUEUED` or `SUBMITTED -> TRANSFERRING`) raise `InvalidStateTransitionError`.
 
-- [ ] **TASK-1.2** (Agent B) — Domain Models & SQLite Schema
+- [x] **TASK-1.2** (Agent B) — Domain Models & SQLite Schema
   - **Files**: `app/models/transfer_request.py`, `app/models/policy_decision.py`, `app/database/connection.py`, `app/database/schema.py`
   - **Description**: Implement Pydantic domain models with PHI validation guards. Define SQLAlchemy ORM tables (`transfer_requests`, `state_transitions`, `policy_decisions`). Create database engine and session factory.
   - **DoD**: SQLite schema creates all tables in memory or file without warnings.
 
-- [ ] **TASK-1.3** (Agent B) — Transfer Repository CRUD Implementation
+- [x] **TASK-1.3** (Agent B) — Transfer Repository CRUD Implementation
   - **Files**: `app/database/repository.py`
   - **Description**: Implement `ITransferRepository` interface for SQLite: `create_request`, `get_request`, `update_status` (recording an immutable transition record), `list_requests` with pagination and status filters.
   - **DoD**: Unit tests verify creating and retrieving requests preserves all timestamp and UUID fields.
 
-- [ ] **TASK-1.4** (Agent C) — Deterministic Security Policy Engine
+- [x] **TASK-1.4** (Agent C) — Deterministic Security Policy Engine
   - **Files**: `app/security/policy_engine.py`, `app/security/authorization.py`, `configs/security.yaml`
   - **Description**: Implement `IPolicyEngine` with strict source/destination authorization tables and security profile validation. Returns `PolicyDecision` object with reason codes (`AUTH_SUCCESS`, `DEST_UNAUTHORIZED`, etc.).
   - **DoD**: Unauthorized destination returns `allowed=False` with `reason_code="DEST_UNAUTHORIZED"`.
 
-- [ ] **TASK-1.5** (Agent C) — FIFO Scheduler Implementation
+- [x] **TASK-1.5** (Agent C) — FIFO Scheduler Implementation
   - **Files**: `app/scheduler/base.py`, `app/scheduler/fifo.py`
   - **Description**: Implement `IScheduler` interface and `FIFOScheduler`. Filters queue for policy-eligible requests and selects the oldest request by `submitted_at`. Returns structured `SchedulingDecision`.
   - **DoD**: Candidate requests submitted at $t_1, t_2, t_3$ are always selected in submission order.
@@ -84,7 +84,7 @@ pytest --collect-only
   - **Description**: Implement SHA-256 payload checksum generator/validator (`IntegrityVerifier`). Implement `SyntheticTransferExecutor` that generates a synthetic buffer, calculates SHA-256, simulates transfer time, and verifies integrity upon completion.
   - **DoD**: Valid synthetic transfer returns `success=True` and `verification_success=True`. Artificially corrupted checksum returns `success=False`.
 
-- [ ] **TASK-1.7** (Agent B) — FastAPI Routes & Main Entrypoint
+- [x] **TASK-1.7** (Agent B) — FastAPI Routes & Main Entrypoint
   - **Files**: `app/api/schemas.py`, `app/api/routes_transfers.py`, `app/main.py`
   - **Description**: Build FastAPI application with `/api/v1/transfers` routes (`POST` create, `GET` by ID, `GET` list, `POST` cancel). Wrap responses in `ApiResponse[T]` envelope. Include global exception handlers.
   - **DoD**: HTTP client can POST a transfer and receive a 201 Created with valid JSON matching `ApiResponse[TransferRequest]`.
@@ -94,7 +94,7 @@ pytest --collect-only
   - **Description**: Write comprehensive tests for FSM transitions, policy authorization, and end-to-end integration: `POST /transfers -> VALIDATING -> QUEUED -> SCHEDULED -> TRANSFERRING -> VERIFYING -> COMPLETED`.
   - **DoD**: `pytest tests/integration/test_tracer_bullet.py` passes 100%.
 
-- [ ] **TASK-1.9** (Agent A) — Standalone Tracer Bullet CLI Script
+- [x] **TASK-1.9** (Agent A) — Standalone Tracer Bullet CLI Script
   - **Files**: `scripts/verify_tracer_bullet.py`
   - **Description**: Create runnable verification CLI script that executes the complete lifecycle for a configurable payload size and prints step-by-step progress and SHA-256 checksums to stdout.
   - **DoD**: Running script exits with returncode 0 and prints `TRACER BULLET COMPLETE: OK`.

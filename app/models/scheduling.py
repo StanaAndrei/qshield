@@ -95,3 +95,4 @@ class TransferResult(BaseModel):
     payload_checksum_sha256: str
     verification_success: bool = True
     error_message: str | None = None
+    is_retryable: bool = False

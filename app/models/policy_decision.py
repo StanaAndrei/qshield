@@ -18,6 +18,8 @@ def utc_now() -> datetime:
 class PolicyDecision(BaseModel):
     """Deterministic security gate evaluation result."""
 
+    decision_id: UUID = Field(default_factory=uuid4)
+    request_id: UUID | None = None
     allowed: bool
     reason_code: str = Field(..., description="Machine-readable code (e.g., AUTH_SUCCESS, DEST_UNAUTHORIZED)")
     explanation: str = Field(..., description="Human-readable decision rationale")
@@ -48,3 +50,6 @@ class AuditEvent(BaseModel):
             else:
                 sanitized[key] = val
         return sanitized
+
+
+__all__ = ["AuditEvent", "PolicyDecision", "utc_now"]

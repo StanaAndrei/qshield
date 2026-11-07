@@ -1,0 +1,57 @@
+# Q-SHIELD Deterministic Security Policy Configuration
+version: "1.0.0"
+
+# Node-level authorization matrix and permissions
+nodes:
+  univ-lab:
+    name: "University Research Laboratory"
+    authorized_destinations:
+      - "poly-clinic"
+      - "central-hospital"
+      - "research-cluster"
+    allowed_profiles:
+      - "QKD_AES_256_GCM"
+      - "QKD_OTP_SIM"
+      - "POST_QUANTUM_HYBRID"
+      - "STANDARD_TLS"
+    max_payload_bytes: 500000000000  # 500 GB
+
+  poly-clinic:
+    name: "Polyclinic Diagnostic Center"
+    authorized_destinations:
+      - "univ-lab"
+      - "central-hospital"
+    allowed_profiles:
+      - "QKD_AES_256_GCM"
+      - "QKD_OTP_SIM"
+      - "POST_QUANTUM_HYBRID"
+      - "STANDARD_TLS"
+    max_payload_bytes: 500000000000
+
+  central-hospital:
+    name: "Central Metropolitan Hospital"
+    authorized_destinations:
+      - "univ-lab"
+      - "poly-clinic"
+    allowed_profiles:
+      - "QKD_AES_256_GCM"
+      - "QKD_OTP_SIM"
+      - "POST_QUANTUM_HYBRID"
+      - "STANDARD_TLS"
+    max_payload_bytes: 500000000000
+
+  research-cluster:
+    name: "Regional HPC Medical Research Cluster"
+    authorized_destinations:
+      - "univ-lab"
+    allowed_profiles:
+      - "QKD_AES_256_GCM"
+      - "POST_QUANTUM_HYBRID"
+      - "STANDARD_TLS"
+    max_payload_bytes: 500000000000
+
+# Global security policy constraints
+constraints:
+  max_payload_bytes_global: 500000000000  # 500 GB limit
+  require_qkd_for_critical: true
+  allow_tls_fallback: true

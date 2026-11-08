@@ -158,7 +158,7 @@ def generate_workload(
     # Pre-generate submission offsets sorted ascending to simulate arrivals
     offsets = sorted(rng.uniform(0.0, submission_window_seconds) for _ in range(n))
 
-    for i, offset in enumerate(offsets):
+    for _i, offset in enumerate(offsets):
         priority = _weighted_choice(priority_distribution, rng)
         data_size = _pareto_sample(rng, min_bytes, max_bytes, pareto_alpha)
         data_category = rng.choice(_DATA_CATEGORIES)
@@ -305,8 +305,8 @@ def run_policy(
         result.starvation_wait_seconds.append(decision.starvation_age_seconds)
 
         # Count deadline miss: check the original request's deadline
-        req = repo.get_request(decision.selected_request_id)
-        if req is not None and req.deadline is not None:
+        selected_req = repo.get_request(decision.selected_request_id)
+        if selected_req is not None and selected_req.deadline is not None:
             if decision.predicted_deadline_miss_probability >= 0.5:
                 result.deadline_miss_count += 1
 
@@ -324,7 +324,7 @@ def _load_yaml_config(path: Path) -> dict[str, Any]:
         raw = yaml.safe_load(fh)
     if not isinstance(raw, dict):
         raise ValueError(f"Invalid YAML config at {path}: expected a mapping")
-    return raw  # type: ignore[return-value]
+    return raw
 
 
 def _parse_priority_distribution(raw: dict[str, float]) -> list[tuple[PriorityLevel, float]]:
@@ -539,7 +539,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: PLR0912
         ]
 
     # ----- Generate workload -----
-    print(f"\nQ-SHIELD Baseline Policy Comparison")
+    print("\nQ-SHIELD Baseline Policy Comparison")
     print(f"{'=' * 60}")
     print(f"Workload size : {workload_size} requests")
     print(f"Random seed   : {seed}")
@@ -569,7 +569,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: PLR0912
     print(f"done ({len(workload)} requests in {t_gen * 1000:.1f} ms)")
 
     with_deadlines = sum(1 for r in workload if r.deadline is not None)
-    print(f"  Priority mix : ", end="")
+    print("  Priority mix : ", end="")
     for prio in [PriorityLevel.CRITICAL, PriorityLevel.HIGH, PriorityLevel.NORMAL, PriorityLevel.LOW]:
         count = sum(1 for r in workload if r.priority == prio)
         print(f"{prio.name}={count}", end="  ")

@@ -1,0 +1,75 @@
+# Q-SHIELD Medical Mixed Workload Scenario
+# Used by TASK-3.3 workload generator and Milestone 3 verification
+
+version: "1.0.0"
+scenario_name: "medical_mixed_workload"
+description: >
+  Synthetic University-Polyclinic medical data exchange scenario.
+  Simulates a mixed workload of diagnostic reports (5 MB), MRI scans (2 GB),
+  and research datasets (500 MB) with Poisson arrivals and Pareto payload sizes.
+
+# Global random seed for reproducibility
+seed: 42
+
+# Total transfer requests to generate
+workload_size: 100
+
+# Scheduling policies to evaluate
+policies:
+  - FIFO
+  - PRIORITY
+  - RESOURCE_AWARE_HEURISTIC
+
+# Simulated network link: University Lab → Polyclinic
+network:
+  source_id: "univ-lab"
+  destination_id: "poly-clinic"
+  throughput_mbps: 100.0
+  throughput_std_mbps: 15.0
+  round_trip_time_ms: 10.0
+  packet_loss_rate: 0.001
+  min_throughput_mbps: 5.0
+
+# QKD key resource buffer
+key_resource:
+  initial_keys: 1000
+  buffer_ceiling: 2000
+  generation_rate_keys_per_second: 10.0
+  keys_per_transfer: 1
+
+# Poisson arrival process
+arrival_rate_per_second: 0.5
+
+# Request priority distribution (weights must sum to 1.0)
+priority_distribution:
+  LOW: 0.20
+  NORMAL: 0.40
+  HIGH: 0.30
+  CRITICAL: 0.10
+
+# Data category distribution (weights must sum to 1.0)
+category_distribution:
+  DIAGNOSTIC_REPORT: 0.40    # 5 MB reports, tight deadlines
+  MEDICAL_IMAGE: 0.30        # 2 GB scans, moderate deadlines
+  RESEARCH_DATASET: 0.20     # 500 MB datasets, relaxed deadlines
+  TELEMETRY_LOG: 0.10        # 1 MB logs, best-effort
+
+# Data size distribution
+data_size_distribution:
+  min_bytes: 1_000_000        # 1 MB
+  max_bytes: 500_000_000      # 500 MB (global cap for this scenario)
+  distribution: "pareto"
+  pareto_alpha: 1.5
+
+# Deadline configuration
+deadline:
+  fraction_with_deadline: 0.60
+  slack_multiplier_min: 1.0    # Deadline = expected_duration * multiplier
+  slack_multiplier_max: 5.0
+
+# Heuristic scheduler overrides (used for RESOURCE_AWARE_HEURISTIC policy)
+heuristic_overrides:
+  weight_priority: 2.0
+  weight_slack: 0.01
+  weight_aging: 0.05
+  max_consecutive_high_priority: 5

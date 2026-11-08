@@ -163,37 +163,37 @@ python scripts/compare_baselines.py --workload-size 100 --seed 42 --policies FIF
 
 ## Milestone 3: High-Performance Discrete-Event Simulation & Parallel Benchmarking
 
-- [ ] **TASK-3.1** (Agent D) — Network Variability & Latency Model
+- [x] **TASK-3.1** (Agent D) — Network Variability & Latency Model
   - **Files**: `simulation/network_model.py`
   - **Description**: Implement network simulation module supporting configurable baseline throughput, Gaussian throughput variability, RTT propagation delay, and stochastic packet drop events.
   - **DoD**: Deterministic throughput generation when configured with fixed seed.
 
-- [ ] **TASK-3.2** (Agent D) — Simulated Key Resource Buffer
+- [x] **TASK-3.2** (Agent D) — Simulated Key Resource Buffer
   - **Files**: `simulation/key_resource_model.py`
   - **Description**: Discrete key-pool model tracking available 256-bit keys, replenishment rate ($R_{\text{gen}}$), buffer ceiling, and key consumption per transfer. Blocks or throttles transfers when key buffer is depleted.
   - **DoD**: Buffer depletes when consumption exceeds generation; transfers pause until replenishment occurs.
 
-- [ ] **TASK-3.3** (Agent D) — Workload Generator & Scenario Configurations
+- [x] **TASK-3.3** (Agent D) — Workload Generator & Scenario Configurations
   - **Files**: `simulation/workload_generator.py`, `simulation/scenarios.py`, `configs/scenarios/medical_mixed_workload.yaml`
   - **Description**: Implement synthetic medical workload generator. Generates requests using Poisson arrivals, Pareto payload distributions, and realistic medical categories (5 MB diagnostic reports, 2 GB scans, 500 MB research sets).
   - **DoD**: Generator produces identical request sets given identical seeds.
 
-- [ ] **TASK-3.4** (Agent D) — Discrete-Event Simulator Core
+- [x] **TASK-3.4** (Agent D) — Discrete-Event Simulator Core
   - **Files**: `simulation/engine.py`
   - **Description**: Discrete-event engine running virtual-time simulations. Orchestrates request arrivals, queueing, scheduling policy decisions, network transfer delays, and completion events without sleeping real CPU time.
   - **DoD**: 1,000 transfer requests simulate in under 5 seconds of real execution time.
 
-- [ ] **TASK-3.5** (Agent D) — Multi-Core Parallel Experiment Runner
+- [x] **TASK-3.5** (Agent D) — Multi-Core Parallel Experiment Runner
   - **Files**: `simulation/parallel_runner.py`
   - **Description**: HPC parallel execution harness using Python `multiprocessing.Pool`. Distributes independent (scenario × policy × seed) simulation jobs across available CPU cores with isolated random states.
   - **DoD**: Runner distributes 20 jobs across 4 cores, achieves >3x speedup over sequential execution, and records individual run outcomes.
 
-- [ ] **TASK-3.6** (Agent D) — Experiment Result Aggregator & Exporter
+- [x] **TASK-3.6** (Agent D) — Experiment Result Aggregator & Exporter
   - **Files**: `simulation/aggregation.py`, `scripts/export_results.py`
   - **Description**: Statistical analysis module calculating mean, median, IQR, 95th percentile completion times, deadline success rates, and relative improvements. Exports formatted CSV and JSON reports.
   - **DoD**: Aggregates 100 simulation runs into summary metrics with valid 95% confidence intervals.
 
-- [ ] **TASK-3.7** (Agent G) — Simulation Determinism & Parallel Scaling Tests
+- [x] **TASK-3.7** (Agent G) — Simulation Determinism & Parallel Scaling Tests
   - **Files**: `tests/simulation/test_simulator_determinism.py`, `tests/simulation/test_workload_generator.py`, `tests/simulation/test_parallel_runner.py`, `scripts/run_experiments.py`
   - **Description**: Test suite verifying that identical seeds yield bit-for-bit identical results and parallel runs do not leak state. Build `scripts/run_experiments.py` CLI tool.
   - **DoD**: `pytest tests/simulation/` passes 100%.

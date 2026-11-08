@@ -115,7 +115,7 @@ python scripts/verify_tracer_bullet.py --payload-size-mb 5 --source "univ-lab" -
 
 ## Milestone 2: Deterministic Baseline Schedulers & Resource Accounting
 
-- [ ] **TASK-2.1** (Agent C) — Priority-Based Scheduler
+- [x] **TASK-2.1** (Agent C) — Priority-Based Scheduler
   - **Files**: `app/scheduler/priority.py`
   - **Description**: Implement `PriorityScheduler`. Sorts eligible requests by `priority` (CRITICAL > HIGH > NORMAL > LOW) with FIFO tie-breaking on `submitted_at`.
   - **DoD**: CRITICAL request submitted later takes precedence over earlier NORMAL request.
@@ -125,14 +125,14 @@ python scripts/verify_tracer_bullet.py --payload-size-mb 5 --source "univ-lab" -
   - **Description**: Implement queue management service. Evaluates pending requests, computes current wait times, detects deadline expirations, and transitions expired requests to `EXPIRED` status.
   - **DoD**: Requests with past deadlines are transitioned to `EXPIRED` and excluded from scheduling.
 
-- [ ] **TASK-2.3** (Agent C) — Resource-Aware Heuristic Scheduler with Starvation Aging
+- [x] **TASK-2.3** (Agent C) — Resource-Aware Heuristic Scheduler with Starvation Aging
   - **Files**: `app/scheduler/resource_aware.py`, `configs/scheduling.yaml`
   - **Description**: Implement `ResourceAwareHeuristicScheduler`. Scoring function balances priority weight, deadline slack ($t_{\text{deadline}} - t_{\text{now}}$), and starvation aging:
     $$\text{score} = w_p \cdot \text{priority} - w_s \cdot \text{slack\_seconds} + w_a \cdot \text{wait\_time\_seconds}$$
     Enforces maximum consecutive high-priority selections before granting service to aged low-priority requests.
   - **DoD**: Starving LOW-priority request eventually out-scores a newly arrived HIGH-priority request after configured aging threshold.
 
-- [ ] **TASK-2.4** (Agent C) — Scheduling Dispatch Service
+- [x] **TASK-2.4** (Agent C) — Scheduling Dispatch Service
   - **Files**: `app/services/scheduling_service.py`
   - **Description**: Service that coordinates queue inspection, selects active policy (FIFO, Priority, Heuristic), executes scheduling step, records `SchedulingDecision` to repository, and triggers execution.
   - **DoD**: Service logs structured scheduling decisions with duration and rationale to SQLite.

@@ -1,0 +1,37 @@
+# Q-SHIELD Resource-Aware Heuristic Scheduler Configuration
+# Controls the scoring weights and starvation policy for ResourceAwareHeuristicScheduler.
+
+version: "1.0.0"
+
+heuristic_scheduler:
+  # Scoring weights for the composite utility function:
+  #   score = w_priority * priority_value
+  #           - w_slack    * slack_seconds
+  #           + w_aging    * wait_time_seconds
+  #
+  # All weights must be non-negative floats.
+
+  # Weight applied to priority integer value (CRITICAL=40, HIGH=30, NORMAL=20, LOW=10)
+  weight_priority: 2.0
+
+  # Penalty weight per second of remaining deadline slack.
+  # Higher values make the scheduler more aggressive about urgent deadlines.
+  weight_slack: 0.01
+
+  # Bonus weight per second a request has waited in queue (starvation aging).
+  # Incrementally boosts low-priority requests that have waited longest.
+  weight_aging: 0.05
+
+  # Maximum number of consecutive high-priority-or-above selections before the
+  # scheduler is forced to consider the most-aged low-priority request regardless
+  # of its current score.  Set to 0 to disable forced preemption.
+  max_consecutive_high_priority: 5
+
+  # Deadline slack sentinel (seconds) used when a request has no deadline set.
+  # A large positive value ensures "no deadline" requests are not penalised for
+  # slack when compared to requests with tight deadlines.
+  no_deadline_sentinel_seconds: 86400  # 24 hours
+
+  # Minimum wait time (seconds) before aging bonus takes effect.
+  # Requests younger than this threshold receive zero aging bonus.
+  aging_threshold_seconds: 0

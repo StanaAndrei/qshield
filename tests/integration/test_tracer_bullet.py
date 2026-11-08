@@ -15,8 +15,6 @@ DoD: `pytest tests/integration/test_tracer_bullet.py` passes 100%.
 from __future__ import annotations
 
 import hashlib
-import time
-import uuid
 from collections.abc import Generator
 from datetime import UTC, datetime, timedelta
 from uuid import UUID, uuid4
@@ -46,7 +44,6 @@ from app.transfer.executor import SyntheticTransferExecutor
 from app.transfer.integrity import IntegrityVerifier
 from app.transfer.simulator import SyntheticTransferSimulator, generate_synthetic_buffer
 from tests.fixtures.mock_repository import InMemoryTransferRepository
-
 
 # ---------------------------------------------------------------------------
 # Shared fixtures
@@ -763,9 +760,9 @@ class TestTracerBulletEndToEnd:
         # Reverse list to prove ordering comes from submitted_at not list order
         queue = list(reversed(requests))
         for expected_req in requests:
-            decision = fifo_scheduler.select_next(queue, telemetry)
-            assert decision is not None
-            assert decision.selected_request_id == expected_req.request_id
+            sched_decision = fifo_scheduler.select_next(queue, telemetry)
+            assert sched_decision is not None
+            assert sched_decision.selected_request_id == expected_req.request_id
             queue = [r for r in queue if r.request_id != expected_req.request_id]
 
     def test_api_post_then_get_full_roundtrip(self, api_client: TestClient) -> None:
@@ -826,7 +823,6 @@ class TestFSMIntegrationInvariants:
 
     def test_no_skip_transitions_allowed(self, sample_transfer_request: TransferRequest) -> None:
         """Skip transitions (SUBMITTED -> TRANSFERRING, SUBMITTED -> COMPLETED) are always rejected."""
-        req = sample_transfer_request
         for forbidden_target in [
             TransferStatus.TRANSFERRING,
             TransferStatus.VERIFYING,

@@ -79,7 +79,7 @@ pytest --collect-only
   - **Description**: Implement `IScheduler` interface and `FIFOScheduler`. Filters queue for policy-eligible requests and selects the oldest request by `submitted_at`. Returns structured `SchedulingDecision`.
   - **DoD**: Candidate requests submitted at $t_1, t_2, t_3$ are always selected in submission order.
 
-- [ ] **TASK-1.6** (Agent F) — Transfer Integrity & Synthetic Transfer Executor
+- [x] **TASK-1.6** (Agent F) — Transfer Integrity & Synthetic Transfer Executor
   - **Files**: `app/transfer/base.py`, `app/transfer/integrity.py`, `app/transfer/simulator.py`, `app/transfer/executor.py`
   - **Description**: Implement SHA-256 payload checksum generator/validator (`IntegrityVerifier`). Implement `SyntheticTransferExecutor` that generates a synthetic buffer, calculates SHA-256, simulates transfer time, and verifies integrity upon completion.
   - **DoD**: Valid synthetic transfer returns `success=True` and `verification_success=True`. Artificially corrupted checksum returns `success=False`.
@@ -89,7 +89,7 @@ pytest --collect-only
   - **Description**: Build FastAPI application with `/api/v1/transfers` routes (`POST` create, `GET` by ID, `GET` list, `POST` cancel). Wrap responses in `ApiResponse[T]` envelope. Include global exception handlers.
   - **DoD**: HTTP client can POST a transfer and receive a 201 Created with valid JSON matching `ApiResponse[TransferRequest]`.
 
-- [ ] **TASK-1.8** (Agent G) — Tracer Bullet Unit & Integration Test Suite
+- [x] **TASK-1.8** (Agent G) — Tracer Bullet Unit & Integration Test Suite
   - **Files**: `tests/unit/test_state_machine.py`, `tests/unit/test_policy_engine.py`, `tests/integration/test_tracer_bullet.py`
   - **Description**: Write comprehensive tests for FSM transitions, policy authorization, and end-to-end integration: `POST /transfers -> VALIDATING -> QUEUED -> SCHEDULED -> TRANSFERRING -> VERIFYING -> COMPLETED`.
   - **DoD**: `pytest tests/integration/test_tracer_bullet.py` passes 100%.

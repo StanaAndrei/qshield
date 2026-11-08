@@ -1,0 +1,54 @@
+# Q-SHIELD Baseline Policy Comparison Scenario
+# Used by scripts/compare_baselines.py (TASK-2.6)
+
+version: "1.0.0"
+scenario_name: "baseline_comparison_test"
+description: >
+  Synthetic medical workload for comparing FIFO, Priority, and
+  Resource-Aware Heuristic scheduling policies.
+
+# Random seed for reproducible request generation
+seed: 42
+
+# Total requests in the simulated queue
+workload_size: 100
+
+# Simulated network link: source → destination
+network:
+  source_id: "univ-lab"
+  destination_id: "poly-clinic"
+  throughput_mbps: 100.0
+  packet_loss_rate: 0.001
+  round_trip_time_ms: 10.0
+
+# Request priority distribution (weights, must sum to 1.0)
+priority_distribution:
+  LOW: 0.20
+  NORMAL: 0.40
+  HIGH: 0.30
+  CRITICAL: 0.10
+
+# Data-size distribution for synthetic payloads (bytes)
+data_size_distribution:
+  min_bytes: 1_000_000        # 1 MB
+  max_bytes: 500_000_000      # 500 MB
+  distribution: "pareto"
+  pareto_alpha: 1.5           # Heavy-tail exponent
+
+# Deadline configuration
+deadline:
+  fraction_with_deadline: 0.60   # Proportion of requests that carry a hard deadline
+  # Deadline slack relative to expected transfer duration
+  slack_multiplier_min: 1.0      # Tightest: deadline = expected_duration * 1.0
+  slack_multiplier_max: 5.0      # Loosest: deadline = expected_duration * 5.0
+
+# Submission time spread
+# Requests are staggered across this window (seconds)
+submission_window_seconds: 300   # 5-minute window
+
+# Heuristic scheduler overrides (used only for RESOURCE_AWARE_HEURISTIC policy)
+heuristic_overrides:
+  weight_priority: 2.0
+  weight_slack: 0.01
+  weight_aging: 0.05
+  max_consecutive_high_priority: 5

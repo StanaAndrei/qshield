@@ -120,7 +120,7 @@ python scripts/verify_tracer_bullet.py --payload-size-mb 5 --source "univ-lab" -
   - **Description**: Implement `PriorityScheduler`. Sorts eligible requests by `priority` (CRITICAL > HIGH > NORMAL > LOW) with FIFO tie-breaking on `submitted_at`.
   - **DoD**: CRITICAL request submitted later takes precedence over earlier NORMAL request.
 
-- [ ] **TASK-2.2** (Agent B) — Queue Service & Deadline Tracking
+- [x] **TASK-2.2** (Agent A) — Queue Service & Deadline Tracking
   - **Files**: `app/services/queue_service.py`
   - **Description**: Implement queue management service. Evaluates pending requests, computes current wait times, detects deadline expirations, and transitions expired requests to `EXPIRED` status.
   - **DoD**: Requests with past deadlines are transitioned to `EXPIRED` and excluded from scheduling.
@@ -137,12 +137,12 @@ python scripts/verify_tracer_bullet.py --payload-size-mb 5 --source "univ-lab" -
   - **Description**: Service that coordinates queue inspection, selects active policy (FIFO, Priority, Heuristic), executes scheduling step, records `SchedulingDecision` to repository, and triggers execution.
   - **DoD**: Service logs structured scheduling decisions with duration and rationale to SQLite.
 
-- [ ] **TASK-2.5** (Agent G) — Baseline Schedulers Unit & Comparative Tests
+- [x] **TASK-2.5** (Agent G) — Baseline Schedulers Unit & Comparative Tests
   - **Files**: `tests/unit/test_priority_scheduler.py`, `tests/unit/test_resource_aware_scheduler.py`, `tests/integration/test_baseline_scheduling.py`
   - **Description**: Unit tests covering priority sorting, slack prioritization, and starvation mitigation. Integration test comparing all three policies on identical 50-request queue.
   - **DoD**: `pytest tests/unit/test_resource_aware_scheduler.py` passes 100%.
 
-- [ ] **TASK-2.6** (Agent A) — Baseline Policy Comparison CLI Tool
+- [x] **TASK-2.6** (Agent A) — Baseline Policy Comparison CLI Tool
   - **Files**: `scripts/compare_baselines.py`, `configs/scenarios/baseline_test.yaml`
   - **Description**: CLI script that ingests a test workload, simulates queue execution under FIFO, Priority, and Heuristic policies, and outputs a formatted table comparing mean latency, deadline miss count, and max starvation wait time.
   - **DoD**: `python scripts/compare_baselines.py --workload configs/scenarios/baseline_test.yaml` executes and prints comparison summary.

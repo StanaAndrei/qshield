@@ -23,7 +23,8 @@ from app.core.enums import DataCategory, PriorityLevel, SchedulingPolicyName
 from app.models.scheduling import SchedulingDecision
 from app.models.telemetry import NetworkTelemetry, QKDResourceMetrics, TelemetrySnapshot
 from app.models.transfer_request import TransferRequest
-from app.scheduler.base import IScheduler
+from app.scheduler.ai_assisted import AIAssistedScheduler
+from app.scheduler.base import IPredictor, IScheduler
 from app.scheduler.fifo import FIFOScheduler
 from app.scheduler.priority import PriorityScheduler
 from app.scheduler.resource_aware import ResourceAwareHeuristicScheduler
@@ -117,7 +118,11 @@ class SimulationResult:
 # Scheduler factory
 # ---------------------------------------------------------------------------
 
-def _build_scheduler(policy_name: str, heuristic_overrides: dict[str, Any] | None = None) -> IScheduler:
+def _build_scheduler(
+    policy_name: str,
+    heuristic_overrides: dict[str, Any] | None = None,
+    predictor: IPredictor | None = None,
+) -> IScheduler:
     """Instantiate the scheduler for the given policy name."""
     if policy_name == SchedulingPolicyName.FIFO or policy_name == "FIFO":
         return FIFOScheduler()
@@ -130,6 +135,15 @@ def _build_scheduler(policy_name: str, heuristic_overrides: dict[str, Any] | Non
             weight_slack=overrides.get("weight_slack"),
             weight_aging=overrides.get("weight_aging"),
             max_consecutive_high_priority=overrides.get("max_consecutive_high_priority"),
+        )
+    if policy_name in (SchedulingPolicyName.AI_ASSISTED, "AI_ASSISTED"):
+        overrides = heuristic_overrides or {}
+        return AIAssistedScheduler(
+            predictor=predictor,
+            alpha_priority=overrides.get("alpha_priority", 2.0),
+            beta_deadline=overrides.get("beta_deadline", 50.0),
+            gamma_duration=overrides.get("gamma_duration", 0.05),
+            delta_age=overrides.get("delta_age", 0.05),
         )
     raise ValueError(f"Unknown scheduling policy: {policy_name}")
 
@@ -146,6 +160,7 @@ class EngineConfig:
     scenario_name: str = "unnamed"
     seed: int = 42
     heuristic_overrides: dict[str, Any] = field(default_factory=dict)
+    predictor: IPredictor | None = None
 
 
 class SimulationEngine:
@@ -187,7 +202,11 @@ class SimulationEngine:
         # Reinitialise components fresh each run
         self._network = NetworkModel(network_config)
         self._key_buffer = KeyResourceModel(key_config)
-        self._scheduler = _build_scheduler(engine_config.policy_name, engine_config.heuristic_overrides)
+        self._scheduler = _build_scheduler(
+            engine_config.policy_name,
+            engine_config.heuristic_overrides,
+            predictor=engine_config.predictor,
+        )
 
         # Records
         self._records: list[TransferRecord] = []

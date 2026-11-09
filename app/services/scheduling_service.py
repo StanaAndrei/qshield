@@ -26,6 +26,7 @@ from app.models.policy_decision import AuditEvent
 from app.models.scheduling import SchedulingDecision
 from app.models.telemetry import TelemetrySnapshot
 from app.models.transfer_request import TransferRequest
+from app.scheduler.ai_assisted import AIAssistedScheduler
 from app.scheduler.base import IPredictor, IScheduler
 from app.scheduler.fifo import FIFOScheduler
 from app.scheduler.priority import PriorityScheduler
@@ -225,8 +226,9 @@ class SchedulingService:
             return PriorityScheduler()
         if policy == SchedulingPolicyName.RESOURCE_AWARE_HEURISTIC:
             return ResourceAwareHeuristicScheduler(**overrides)
-        # AI_ASSISTED is handled in Milestone 4; fall back to FIFO for now.
-        logger.warning("Policy %s not yet implemented; falling back to FIFO.", policy)
+        if policy == SchedulingPolicyName.AI_ASSISTED:
+            return AIAssistedScheduler(**overrides)
+        logger.warning("Policy %s not recognized; falling back to FIFO.", policy)
         return FIFOScheduler()
 
 

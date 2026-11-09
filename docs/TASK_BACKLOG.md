@@ -226,39 +226,39 @@ python scripts/export_results.py \
   - **Description**: Implement real-time telemetry snapshot builder (`TelemetrySnapshot`) aggregating active transfers, queue depth, rolling throughput, and QKD metrics. Record completed transfer records to SQLite historical store.
   - **DoD**: Telemetry snapshot reflects active transfers in real time.
 
-- [ ] **TASK-4.2** (Agent E) — Feature Engineering & Normalization Pipeline
+- [x] **TASK-4.2** (Agent E) — Feature Engineering & Normalization Pipeline
   - **Files**: `app/predictor/features.py`
   - **Description**: Transform `TransferRequest` and `TelemetrySnapshot` into normalized `PredictionFeatures`. Handle missing optional QKD metrics explicitly with sentinel values or imputation flags.
   - **DoD**: Unit test confirms consistent vector dimensions and handles `None` QKD fields without throwing exceptions.
 
-- [ ] **TASK-4.3** (Agent E) — Analytical & Historical Baseline Predictors
+- [x] **TASK-4.3** (Agent E) — Analytical & Historical Baseline Predictors
   - **Files**: `app/predictor/baseline.py`
   - **Description**: Implement analytical estimator ($\text{size} \times 8 / \text{throughput}$) and historical moving-average baseline conforming to `IPredictor`.
   - **DoD**: Analytical predictor computes correct transfer durations for known sizes and bandwidths.
 
-- [ ] **TASK-4.4** (Agent E) — ML Training Pipeline & Regressors
+- [x] **TASK-4.4** (Agent E) — ML Training Pipeline & Regressors
   - **Files**: `app/predictor/train.py`, `app/predictor/evaluate.py`
   - **Description**: Build training pipeline using `scikit-learn` supporting Ridge Regression, Random Forest, and Gradient Boosting Regressors. Implement cross-validation, train/test split by seed to avoid leakage, and compute MAE, RMSE, and $R^2$.
   - **DoD**: Pipeline trains on JSON simulation dataset and achieves $R^2 > 0.85$ on test set.
 
-- [ ] **TASK-4.5** (Agent E) — Model Registry & Artifact Serialization
+- [x] **TASK-4.5** (Agent E) — Model Registry & Artifact Serialization
   - **Files**: `app/predictor/model_registry.py`, `scripts/train_model.py`
   - **Description**: Save/load trained models with `joblib`. Include metadata sidecar (`model_version`, feature schema, training date, hyperparameters, evaluation metrics). Provide CLI script `scripts/train_model.py`.
   - **DoD**: CLI script trains and serializes model; registry loads model and successfully predicts against new feature vector.
 
-- [ ] **TASK-4.6** (Agent C) — AI-Assisted Scheduling Policy
+- [x] **TASK-4.6** (Agent C) — AI-Assisted Scheduling Policy
   - **Files**: `app/scheduler/ai_assisted.py`
   - **Description**: Implement `AIAssistedScheduler`. Uses predicted duration and predicted deadline-miss probability:
     $$\text{utility} = \alpha \cdot \text{priority} + \beta \cdot (1 - P(\text{miss})) - \gamma \cdot \text{duration}_{\text{pred}} + \delta \cdot \text{age}$$
     Gracefully falls back to analytical baseline if the ML model is unavailable. Deterministic security policy is strictly preserved.
   - **DoD**: Scheduler ranks candidate requests using model predictions while strictly respecting policy eligibility.
 
-- [ ] **TASK-4.7** (Agent G) — AI Model & Policy Integration Tests
+- [x] **TASK-4.7** (Agent G) — AI Model & Policy Integration Tests
   - **Files**: `tests/unit/test_feature_extraction.py`, `tests/unit/test_predictor_models.py`, `tests/integration/test_ai_scheduling.py`
   - **Description**: Test feature extraction edge cases, model inference speed (<10 ms per decision), model fallback behavior, and comparative deadline satisfaction.
   - **DoD**: `pytest tests/integration/test_ai_scheduling.py` passes 100%.
 
-- [ ] **TASK-4.8** (Agent E) — Comparative Policy Evaluation CLI Tool
+- [x] **TASK-4.8** (Agent E) — Comparative Policy Evaluation CLI Tool
   - **Files**: `scripts/evaluate_policy_gain.py`
   - **Description**: CLI script running identical workloads through Heuristic vs AI-Assisted policies and outputting comparative deadline success rate, MAE, and throughput improvements.
   - **DoD**: Script completes multi-seed comparison and outputs JSON/markdown summary.

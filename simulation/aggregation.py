@@ -347,8 +347,33 @@ def _summary_to_dict(summary: PolicySummary) -> dict[str, Any]:
     }
 
 
+def _record_to_dict(rec: TransferRecord) -> dict[str, Any]:
+    """Convert a TransferRecord to a serialisable dict."""
+    return {
+        "request_id": rec.request_id,
+        "source_id": rec.source_id,
+        "destination_id": rec.destination_id,
+        "data_size_bytes": rec.data_size_bytes,
+        "priority": rec.priority.value if hasattr(rec.priority, "value") else rec.priority,
+        "data_category": rec.data_category.value if hasattr(rec.data_category, "value") else str(rec.data_category),
+        "arrival_time": rec.arrival_time,
+        "queue_time": rec.queue_time,
+        "start_time": rec.start_time,
+        "completion_time": rec.completion_time,
+        "deadline": rec.deadline.isoformat() if rec.deadline else None,
+        "deadline_met": rec.deadline_met,
+        "key_wait_time": rec.key_wait_time,
+        "policy_name": rec.policy_name,
+        "actual_throughput_mbps": rec.actual_throughput_mbps,
+        "total_duration_seconds": rec.total_duration_seconds,
+        "transfer_duration_seconds": rec.transfer_duration_seconds,
+        "success": rec.success,
+        "failure_reason": rec.failure_reason,
+    }
+
+
 def _result_to_dict(r: SimulationResult) -> dict[str, Any]:
-    """Convert a SimulationResult to a JSON-serialisable dict (without records)."""
+    """Convert a SimulationResult to a JSON-serialisable dict (with records)."""
     return {
         "scenario_name": r.scenario_name,
         "policy_name": r.policy_name,
@@ -366,6 +391,7 @@ def _result_to_dict(r: SimulationResult) -> dict[str, Any]:
         "mean_throughput_mbps": r.mean_throughput_mbps,
         "deadline_success_rate": r.deadline_success_rate,
         "real_elapsed_seconds": r.real_elapsed_seconds,
+        "records": [_record_to_dict(rec) for rec in r.records],
     }
 
 
@@ -451,7 +477,7 @@ def export_to_csv(
     ]
 
     with output_path.open("w", newline="") as fh:
-        writer = csv.DictWriter(fh, fieldnames=fieldnames)
+        writer = csv.DictWriter(fh, fieldnames=fieldnames, extrasaction="ignore")
         writer.writeheader()
         for r in results:
             writer.writerow(_result_to_dict(r))

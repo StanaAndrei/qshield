@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
+from typing import Any
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
@@ -49,3 +50,33 @@ class TelemetrySnapshot(BaseModel):
     network_metrics: dict[str, NetworkTelemetry] = Field(default_factory=dict)  # key: f"{src}->{dst}"
     qkd_metrics: dict[str, QKDResourceMetrics] = Field(default_factory=dict)  # key: f"{src}->{dst}"
     system_load_factor: float = Field(default=0.0, ge=0.0, le=1.0)
+
+
+class TransferObservation(BaseModel):
+    """Historical observation of an executed transfer recorded for telemetry and model training."""
+
+    observation_id: UUID = Field(default_factory=uuid4)
+    request_id: UUID
+    source_id: str
+    destination_id: str
+    data_size_bytes: int = Field(..., ge=0)
+    priority_level: int = Field(default=20)
+    data_category: str = Field(default="DIAGNOSTIC_REPORT")
+    actual_duration_seconds: float = Field(..., ge=0.0)
+    effective_throughput_mbps: float = Field(..., ge=0.0)
+    success: bool = True
+    verification_success: bool = True
+    payload_checksum_sha256: str | None = None
+    error_message: str | None = None
+    queue_wait_seconds: float = Field(default=0.0, ge=0.0)
+    observed_at: datetime = Field(default_factory=utc_now)
+    features_snapshot: dict[str, Any] = Field(default_factory=dict)
+
+
+__all__ = [
+    "NetworkTelemetry",
+    "QKDResourceMetrics",
+    "TelemetrySnapshot",
+    "TransferObservation",
+    "utc_now",
+]

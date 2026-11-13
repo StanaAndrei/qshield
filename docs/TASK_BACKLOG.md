@@ -221,7 +221,7 @@ python scripts/export_results.py \
 
 ## Milestone 4: AI Telemetry & Predictive Scheduling Engine
 
-- [ ] **TASK-4.1** (Agent B) — Telemetry Collector & Historical Observation Store
+- [x] **TASK-4.1** (Agent B) — Telemetry Collector & Historical Observation Store
   - **Files**: `app/telemetry/collector.py`, `app/telemetry/history.py`, `app/telemetry/metrics.py`
   - **Description**: Implement real-time telemetry snapshot builder (`TelemetrySnapshot`) aggregating active transfers, queue depth, rolling throughput, and QKD metrics. Record completed transfer records to SQLite historical store.
   - **DoD**: Telemetry snapshot reflects active transfers in real time.

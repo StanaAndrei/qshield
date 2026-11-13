@@ -29,6 +29,7 @@ from app.core.enums import (
 )
 from app.models.policy_decision import AuditEvent, PolicyDecision
 from app.models.scheduling import SchedulingDecision
+from app.models.telemetry import TransferObservation
 from app.models.transfer_request import StateTransitionRecord, TransferRequest
 
 
@@ -301,11 +302,76 @@ class AuditEventORM(Base):
         )
 
 
+class TransferObservationORM(Base):
+    """SQLAlchemy ORM table mapping for transfer_observations."""
+
+    __tablename__ = "transfer_observations"
+
+    observation_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    request_id: Mapped[str] = mapped_column(String(36), index=True, nullable=False)
+    source_id: Mapped[str] = mapped_column(String(64), index=True, nullable=False)
+    destination_id: Mapped[str] = mapped_column(String(64), index=True, nullable=False)
+    data_size_bytes: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    priority_level: Mapped[int] = mapped_column(Integer, nullable=False)
+    data_category: Mapped[str] = mapped_column(String(64), nullable=False)
+    actual_duration_seconds: Mapped[float] = mapped_column(Float, nullable=False)
+    effective_throughput_mbps: Mapped[float] = mapped_column(Float, nullable=False)
+    success: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    verification_success: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    payload_checksum_sha256: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    queue_wait_seconds: Mapped[float] = mapped_column(Float, default=0.0, nullable=False)
+    observed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True, nullable=False)
+    features_json: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict, nullable=False)
+
+    def to_domain(self) -> TransferObservation:
+        return TransferObservation(
+            observation_id=UUID(self.observation_id),
+            request_id=UUID(self.request_id),
+            source_id=self.source_id,
+            destination_id=self.destination_id,
+            data_size_bytes=self.data_size_bytes,
+            priority_level=self.priority_level,
+            data_category=self.data_category,
+            actual_duration_seconds=self.actual_duration_seconds,
+            effective_throughput_mbps=self.effective_throughput_mbps,
+            success=self.success,
+            verification_success=self.verification_success,
+            payload_checksum_sha256=self.payload_checksum_sha256,
+            error_message=self.error_message,
+            queue_wait_seconds=self.queue_wait_seconds,
+            observed_at=_ensure_utc(self.observed_at) or datetime.now(UTC),
+            features_snapshot=dict(self.features_json),
+        )
+
+    @classmethod
+    def from_domain(cls, obs: TransferObservation) -> TransferObservationORM:
+        return cls(
+            observation_id=str(obs.observation_id),
+            request_id=str(obs.request_id),
+            source_id=obs.source_id,
+            destination_id=obs.destination_id,
+            data_size_bytes=obs.data_size_bytes,
+            priority_level=obs.priority_level,
+            data_category=obs.data_category,
+            actual_duration_seconds=obs.actual_duration_seconds,
+            effective_throughput_mbps=obs.effective_throughput_mbps,
+            success=obs.success,
+            verification_success=obs.verification_success,
+            payload_checksum_sha256=obs.payload_checksum_sha256,
+            error_message=obs.error_message,
+            queue_wait_seconds=obs.queue_wait_seconds,
+            observed_at=obs.observed_at,
+            features_json=obs.features_snapshot,
+        )
+
+
 __all__ = [
     "AuditEventORM",
     "Base",
     "PolicyDecisionORM",
     "SchedulingDecisionORM",
     "StateTransitionORM",
+    "TransferObservationORM",
     "TransferRequestORM",
 ]

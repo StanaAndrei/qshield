@@ -10,6 +10,7 @@ from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
+from app.api.routes_telemetry import router as telemetry_router
 from app.api.routes_transfers import router as transfers_router
 from app.api.schemas import ApiErrorDetail, ApiErrorEnvelope, ApiResponse
 from app.core.config import settings
@@ -41,8 +42,9 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Mount transfer routes
+# Mount transfer and telemetry routes
 app.include_router(transfers_router, prefix="/api/v1/transfers", tags=["Transfers"])
+app.include_router(telemetry_router, prefix="/api/v1/metrics", tags=["Telemetry"])
 
 
 # -----------------------------------------------------------------------------

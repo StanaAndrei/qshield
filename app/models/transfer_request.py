@@ -30,10 +30,23 @@ class TransferRequestCreate(BaseModel):
     @field_validator("metadata")
     @classmethod
     def validate_metadata_no_phi(cls, v: dict[str, Any]) -> dict[str, Any]:
-        forbidden_keys = {"patient_name", "ssn", "mrn", "raw_payload", "key_bytes", "secret"}
+        forbidden_keys = {
+            "patient_name",
+            "patient_ssn",
+            "ssn",
+            "mrn",
+            "patient_dob",
+            "dob",
+            "phi_notes",
+            "phi",
+            "raw_payload",
+            "key_bytes",
+            "secret",
+        }
         for k in v.keys():
-            if k.lower() in forbidden_keys:
-                raise ValueError(f"Forbidden sensitive key detected in metadata: {k}")
+            k_lower = k.lower()
+            if k_lower in forbidden_keys or any(term in k_lower for term in ("patient", "ssn", "mrn", "phi")):
+                raise ValueError(f"Forbidden sensitive PHI key detected in metadata: {k}")
         return v
 
 
@@ -61,6 +74,28 @@ class TransferRequest(BaseModel):
     verification_completed_at: datetime | None = None
     failure_reason: str | None = None
     payload_checksum_sha256: str | None = None
+
+    @field_validator("metadata")
+    @classmethod
+    def validate_metadata_no_phi(cls, v: dict[str, Any]) -> dict[str, Any]:
+        forbidden_keys = {
+            "patient_name",
+            "patient_ssn",
+            "ssn",
+            "mrn",
+            "patient_dob",
+            "dob",
+            "phi_notes",
+            "phi",
+            "raw_payload",
+            "key_bytes",
+            "secret",
+        }
+        for k in v.keys():
+            k_lower = k.lower()
+            if k_lower in forbidden_keys or any(term in k_lower for term in ("patient", "ssn", "mrn", "phi")):
+                raise ValueError(f"Forbidden sensitive PHI key detected in metadata: {k}")
+        return v
 
 
 class StateTransitionRecord(BaseModel):

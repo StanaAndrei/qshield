@@ -316,7 +316,7 @@ python scripts/evaluate_policy_gain.py \
   - **Description**: Implement append-only `AuditLogger` writing to SQLite `audit_events`. Pydantic validator automatically scrubs and redacts any key, secret, or payload terms from log parameters.
   - **DoD**: Audit event containing `"key_bytes": "deadbeef"` is saved as `"[REDACTED_BY_AUDIT_POLICY]"`.
 
-- [ ] **TASK-5.6** (Agent G) — Security Boundary & Zero-Leakage Test Suite
+- [x] **TASK-5.6** (Agent G) — Security Boundary & Zero-Leakage Test Suite
   - **Files**: `tests/security/test_security_boundaries.py`, `tests/security/test_leakage_guards.py`
   - **Description**: Test that unauthorized sources/destinations are rejected, AI predictions cannot override policy decisions, and no raw keys or synthetic medical data appear in logs.
   - **DoD**: `pytest tests/security/` passes 100%.

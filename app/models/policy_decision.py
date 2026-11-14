@@ -43,9 +43,13 @@ class AuditEvent(BaseModel):
     def sanitize_audit_details(cls, v: dict[str, Any]) -> dict[str, Any]:
         """Strict guard against accidental cryptographic key or PHI leakage."""
         sanitized: dict[str, Any] = {}
-        disallowed = {"key", "key_bytes", "secret", "token", "password", "payload", "plaintext"}
+        allowed_metadata = {"key_id", "key_length_bits", "key_length", "key_generation_rate_bps", "key_service_latency_ms", "keys_consumed"}
+        disallowed = {"key_bytes", "secret", "token", "password", "payload", "plaintext", "raw_key", "private_key"}
         for key, val in v.items():
-            if any(term in key.lower() for term in disallowed):
+            k_lower = key.lower()
+            if k_lower in allowed_metadata:
+                sanitized[key] = val
+            elif k_lower == "key" or any(term in k_lower for term in disallowed):
                 sanitized[key] = "[REDACTED_BY_AUDIT_POLICY]"
             else:
                 sanitized[key] = val

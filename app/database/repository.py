@@ -69,6 +69,11 @@ class ITransferRepository(ABC):
         """Appends an immutable audit event."""
         pass
 
+    @abstractmethod
+    def get_audit_events(self, request_id: UUID | None = None) -> list[AuditEvent]:
+        """Retrieves recorded audit events."""
+        pass
+
 
 class SqliteTransferRepository(ITransferRepository):
     """Production and simulation SQLite repository implementation conforming to ITransferRepository."""

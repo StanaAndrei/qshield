@@ -311,7 +311,7 @@ python scripts/evaluate_policy_gain.py \
   - **Description**: Implement `CryptoAdapter` supporting `QKD_AES_256_GCM` (using key derived from `KeyHandle`) and `QKD_OTP_SIM`. Performs encryption, decryption, and SHA-256 verification.
   - **DoD**: Roundtrip encrypt and decrypt produces identical plaintext bytes and identical SHA-256 hash.
 
-- [ ] **TASK-5.5** (Agent A) — Cryptographic Audit Logger & Automatic Redaction
+- [x] **TASK-5.5** (Agent A) — Cryptographic Audit Logger & Automatic Redaction
   - **Files**: `app/security/audit.py`
   - **Description**: Implement append-only `AuditLogger` writing to SQLite `audit_events`. Pydantic validator automatically scrubs and redacts any key, secret, or payload terms from log parameters.
   - **DoD**: Audit event containing `"key_bytes": "deadbeef"` is saved as `"[REDACTED_BY_AUDIT_POLICY]"`.
@@ -321,7 +321,7 @@ python scripts/evaluate_policy_gain.py \
   - **Description**: Test that unauthorized sources/destinations are rejected, AI predictions cannot override policy decisions, and no raw keys or synthetic medical data appear in logs.
   - **DoD**: `pytest tests/security/` passes 100%.
 
-- [ ] **TASK-5.7** (Agent A) — Automated Compliance Audit CLI Tool
+- [x] **TASK-5.7** (Agent A) — Automated Compliance Audit CLI Tool
   - **Files**: `scripts/audit_security_compliance.py`
   - **Description**: Automated scanner that reads log files and SQLite database tables searching for regex patterns matching private keys, secrets, or unredacted payload markers. Exits non-zero if any leak is detected.
   - **DoD**: Running script on test database returns returncode 0 with message `AUDIT CLEAN: Zero secrets or PHI detected`.

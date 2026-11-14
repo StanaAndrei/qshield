@@ -105,8 +105,10 @@ class InMemoryTransferRepository(ITransferRepository):
         with self._lock:
             return [d.model_copy(deep=True) for d in self._scheduling_decisions]
 
-    def get_audit_events(self) -> list[AuditEvent]:
+    def get_audit_events(self, request_id: UUID | None = None) -> list[AuditEvent]:
         with self._lock:
+            if request_id is not None:
+                return [e.model_copy(deep=True) for e in self._audit_events if e.request_id == request_id]
             return [e.model_copy(deep=True) for e in self._audit_events]
 
     def clear(self) -> None:

@@ -291,22 +291,22 @@ python scripts/evaluate_policy_gain.py \
 
 ## Milestone 5: Pluggable QKD Hardware Abstraction & Security Hardening
 
-- [ ] **TASK-5.1** (Agent F) — QKD Adapter Abstract Interface & Capabilities
+- [x] **TASK-5.1** (Agent F) — QKD Adapter Abstract Interface & Capabilities
   - **Files**: `app/qkd/base.py`, `app/qkd/capabilities.py`
   - **Description**: Define `IQKDAdapter` abstract base class with `get_status()`, `get_resource_metrics()`, and `acquire_key_handle()`. Define `QKDCapabilities` negotiation schema.
   - **DoD**: Abstract interface enforces signature contracts without exposing raw key bytes.
 
-- [ ] **TASK-5.2** (Agent F) — Leaky-Bucket QKD Simulator Adapter
+- [x] **TASK-5.2** (Agent F) — Leaky-Bucket QKD Simulator Adapter
   - **Files**: `app/qkd/simulator.py`
   - **Description**: Implement `QKDSimulatorAdapter` with configurable initial key count, replenishment rate, buffer limit, and simulated temporary outages. Returns opaque `KeyHandle` objects.
   - **DoD**: Requests when buffer is 0 return status indicating resource wait; replenish restores key availability.
 
-- [ ] **TASK-5.3** (Agent F) — Defensive Real QKD Adapter Placeholder
+- [x] **TASK-5.3** (Agent F) — Defensive Real QKD Adapter Placeholder
   - **Files**: `app/qkd/real_adapter.py`
   - **Description**: Implement `QKDRealAdapter`. Enforces spec §7.2: raises explicit `QKDHardwareNotConfiguredError` with instructions on physical credentials and endpoints. Does NOT contain fabricated endpoints.
   - **DoD**: Attempting to initialize without authorized hardware config throws expected exception with informative guidance.
 
-- [ ] **TASK-5.4** (Agent F) — Pluggable Transport Crypto Adapter
+- [x] **TASK-5.4** (Agent F) — Pluggable Transport Crypto Adapter
   - **Files**: `app/transfer/crypto_adapter.py`
   - **Description**: Implement `CryptoAdapter` supporting `QKD_AES_256_GCM` (using key derived from `KeyHandle`) and `QKD_OTP_SIM`. Performs encryption, decryption, and SHA-256 verification.
   - **DoD**: Roundtrip encrypt and decrypt produces identical plaintext bytes and identical SHA-256 hash.

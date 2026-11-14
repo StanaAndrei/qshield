@@ -72,12 +72,45 @@ class QKDNotConfiguredError(QKDError):
 # Alias for spec section 7.2 compliance
 QKDHardwareNotConfiguredError = QKDNotConfiguredError
 
+
+class QKDKeyBufferDepletedError(QKDError):
+    """Raised when key buffer is depleted and cannot fulfill key acquisition."""
+
+    def __init__(
+        self,
+        message: str = "QKD key buffer depleted; resource wait required.",
+        code: str = "KEY_BUFFER_DEPLETED",
+    ) -> None:
+        super().__init__(message, code=code)
+
+
+class CryptoError(QShieldError):
+    """Base exception for cryptographic operations."""
+
+    def __init__(self, message: str, code: str = "CRYPTO_ERROR") -> None:
+        super().__init__(message, code=code)
+
+
+class DecryptionError(CryptoError):
+    """Raised when decryption or tag verification fails."""
+
+    def __init__(
+        self,
+        message: str = "Decryption failed: invalid ciphertext, key, or tag authentication mismatch.",
+        code: str = "DECRYPTION_FAILED",
+    ) -> None:
+        super().__init__(message, code=code)
+
+
 __all__ = [
+    "CryptoError",
+    "DecryptionError",
     "IntegrityVerificationError",
     "InvalidStateTransitionError",
     "PolicyViolationError",
     "QKDError",
     "QKDHardwareNotConfiguredError",
+    "QKDKeyBufferDepletedError",
     "QKDNotConfiguredError",
     "QShieldError",
     "SchedulingError",

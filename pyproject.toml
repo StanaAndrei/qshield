@@ -93,6 +93,7 @@ module = [
     "joblib.*",
     "streamlit.*",
     "plotly.*",
+    "pandas.*",
 ]
 ignore_missing_imports = true
 

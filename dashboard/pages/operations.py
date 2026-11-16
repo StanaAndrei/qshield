@@ -9,7 +9,6 @@ from __future__ import annotations
 import time
 from datetime import UTC, datetime
 from typing import Any
-from uuid import UUID
 
 import pandas as pd
 import streamlit as st
@@ -19,7 +18,6 @@ from dashboard.components.metrics_cards import render_kpi_cards, render_secondar
 from dashboard.data import (
     format_bytes,
     format_duration,
-    format_throughput,
     format_timestamp,
     get_active_transfers,
     get_all_transfers,
@@ -298,5 +296,5 @@ def render_operations_page() -> None:
 
 
 # Execute page rendering when run directly as script or via Streamlit
-if __name__ == "__main__" or "streamlit" in getattr(st, "__name__", ""):
+if __name__ == "__main__":
     render_operations_page()

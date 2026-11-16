@@ -345,7 +345,7 @@ python scripts/audit_security_compliance.py \
 
 ## Milestone 6: Operational & Research Dashboard, Statistical Evaluation & Pitch Demo
 
-- [ ] **TASK-6.1** (Agent B) — Streamlit Dashboard & Operational Monitor
+- [x] **TASK-6.1** (Agent B) — Streamlit Dashboard & Operational Monitor
   - **Files**: `dashboard/app.py`, `dashboard/pages/operations.py`, `dashboard/components/metrics_cards.py`
   - **Description**: Build Streamlit multi-page interface. Implement Operations page displaying live transfer queue, active transfer progress bars, QKD key buffer gauges, and recent completion status.
   - **DoD**: Streamlit page loads data from API or SQLite repository without exceptions.

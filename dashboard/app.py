@@ -28,22 +28,11 @@ def _render_operations() -> None:
     render_operations_page()
 
 
-def _render_experiments_placeholder() -> None:
-    """Renders the Experiment Analytics page or placeholder if not yet implemented."""
-    try:
-        import importlib
+def _render_experiments() -> None:
+    """Renders the Research Experiment Analytics page (TASK-6.2)."""
+    from dashboard.pages.experiments import render_experiments_page
 
-        mod = importlib.import_module("dashboard.pages.experiments")
-        render_fn = mod.render_experiments_page
-        render_fn()
-    except (ImportError, AttributeError):
-        st.markdown("## 🔬 Research Experiment Analytics")
-        st.caption("Cross-policy comparative benchmarking and statistical evaluation")
-        st.info(
-            "The Research Experiment Analytics page will be available under **Milestone 6 (TASK-6.2)**. "
-            "It visualizes benchmark runs across FIFO, Priority, Heuristic, and AI-assisted schedulers.",
-            icon="ℹ️",
-        )
+    render_experiments_page()
 
 
 def _render_model_evaluation_placeholder() -> None:
@@ -80,7 +69,7 @@ def main() -> None:
         default=True,
     )
     experiments_page = st.Page(
-        _render_experiments_placeholder,
+        _render_experiments,
         title="Experiment Analytics",
         icon="🔬",
     )

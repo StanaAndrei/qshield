@@ -7,6 +7,7 @@ from pathlib import Path
 
 from simulation.aggregation import (
     ResultAggregator,
+    export_latex_table,
     export_markdown_table,
     export_to_csv,
     export_to_json,
@@ -81,3 +82,18 @@ class TestAggregation:
         assert md_file.exists()
         assert "FIFO" in md_content
         assert "PRIORITY" in md_content
+        assert "±" in md_content
+
+        # Test LaTeX export
+        tex_file = tmp_path / "table.tex"
+        tex_content = export_latex_table(report, output_path=tex_file, format_ci=True)
+        assert tex_file.exists()
+        assert r"\begin{table}" in tex_content
+        assert r"\toprule" in tex_content
+        assert r"\pm" in tex_content
+        assert "FIFO" in tex_content
+        assert "PRIORITY" in tex_content
+
+        # Test without CI
+        tex_no_ci = export_latex_table(report, format_ci=False)
+        assert r"\pm" not in tex_no_ci

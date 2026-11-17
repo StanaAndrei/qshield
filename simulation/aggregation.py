@@ -534,7 +534,9 @@ def export_markdown_table(
             policy_name,
             _fmt(summary.mean_duration_seconds, summary.mean_duration_ci),
             _fmt(summary.p95_duration_seconds, summary.p95_duration_ci),
-            _fmt(summary.deadline_success_rate, summary.deadline_success_rate_ci),
+            f"{summary.deadline_success_rate:.1%} ±{summary.deadline_success_rate_ci.half_width:.1%}"
+            if format_ci
+            else f"{summary.deadline_success_rate:.1%}",
             f"{summary.mean_queue_wait_seconds:.2f}",
             f"{summary.mean_throughput_mbps:.2f}",
         ]
@@ -564,11 +566,112 @@ def export_markdown_table(
     return markdown
 
 
+def export_latex_table(
+    report: AggregationReport,
+    output_path: str | Path | None = None,
+    format_ci: bool = True,
+    caption: str | None = None,
+    label: str = "tab:qshield_experiment_results",
+) -> str:
+    """Generate publication-ready LaTeX tables with optional 95% CI bounds.
+
+    Parameters
+    ----------
+    report:
+        Aggregated report from ``ResultAggregator.aggregate()``.
+    output_path:
+        Optional file path to write the LaTeX table (.tex); if None returns as string.
+    format_ci:
+        If True, include $\\pm 95\\%$ CI bounds in the table cells.
+    caption:
+        Optional LaTeX table caption.
+    label:
+        LaTeX table label for cross-referencing.
+
+    Returns
+    -------
+    str
+        Publication-ready LaTeX table code.
+    """
+    def _escape(text: str) -> str:
+        return text.replace("_", r"\_").replace("%", r"\%")
+
+    cap = caption or f"Q-SHIELD Benchmark Results: {_escape(report.scenario_name)} (Runs: {report.total_runs})"
+    lines: list[str] = [
+        r"\begin{table}[htbp]",
+        r"\centering",
+        f"\\caption{{{cap}}}",
+        f"\\label{{{label}}}",
+        r"\begin{tabular}{lccccc}",
+        r"\toprule",
+        r"Policy & Mean Duration (s) & P95 Duration (s) & Deadline Success & Mean Wait (s) & Throughput (Mbps) \\",
+        r"\midrule",
+    ]
+
+    for policy_name in report.policies:
+        summary = report.summaries.get(policy_name)
+        if summary is None:
+            continue
+
+        esc_policy = _escape(policy_name)
+        if format_ci:
+            mean_dur_str = f"${summary.mean_duration_seconds:.2f} \\pm {summary.mean_duration_ci.half_width:.2f}$"
+            p95_dur_str = f"${summary.p95_duration_seconds:.2f} \\pm {summary.p95_duration_ci.half_width:.2f}$"
+            dsr_pct = summary.deadline_success_rate * 100.0
+            dsr_ci_pct = summary.deadline_success_rate_ci.half_width * 100.0
+            dsr_str = f"${dsr_pct:.1f}\\% \\pm {dsr_ci_pct:.1f}\\%$"
+        else:
+            mean_dur_str = f"{summary.mean_duration_seconds:.2f}"
+            p95_dur_str = f"{summary.p95_duration_seconds:.2f}"
+            dsr_str = f"{summary.deadline_success_rate * 100.0:.1f}\\%"
+
+        row = [
+            esc_policy,
+            mean_dur_str,
+            p95_dur_str,
+            dsr_str,
+            f"{summary.mean_queue_wait_seconds:.2f}",
+            f"{summary.mean_throughput_mbps:.2f}",
+        ]
+        lines.append(" & ".join(row) + r" \\")
+
+    lines.append(r"\bottomrule")
+    lines.append(r"\end{tabular}")
+
+    # Relative improvements table if present
+    if report.relative_improvements:
+        lines.append(r"\vspace{0.3cm}")
+        lines.append(r"\begin{tabular}{lcc}")
+        lines.append(r"\toprule")
+        lines.append(r"Policy & Deadline Success Rate $\Delta$ & Mean Duration $\Delta$ \\")
+        lines.append(r"\midrule")
+        for policy_name, improvements in report.relative_improvements.items():
+            dsr = improvements.get("deadline_success_rate", 0.0)
+            dur = improvements.get("mean_duration", 0.0)
+            esc_p = _escape(policy_name)
+            lines.append(f"{esc_p} & {dsr:+.1f}\\% & {dur:+.1f}\\% \\\\")
+        lines.append(r"\bottomrule")
+        lines.append(r"\end{tabular}")
+
+    lines.append(r"\end{table}")
+    lines.append("")
+
+    latex_code = "\n".join(lines)
+
+    if output_path is not None:
+        out = Path(output_path)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(latex_code)
+
+    return latex_code
+
+
 __all__ = [
     "AggregationReport",
     "ConfidenceInterval",
     "PolicySummary",
     "ResultAggregator",
+    "export_latex_table",
     "export_markdown_table",
     "export_to_csv",
     "export_to_json",

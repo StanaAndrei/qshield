@@ -24,6 +24,7 @@ from simulation.aggregation import (
     ConfidenceInterval,
     PolicySummary,
     ResultAggregator,
+    export_latex_table,
     export_markdown_table,
     export_to_csv,
     export_to_json,
@@ -107,8 +108,8 @@ def main() -> int:
     )
     parser.add_argument(
         "--input",
-        required=True,
-        help="Path to input JSON results file (from scripts/run_experiments.py).",
+        default="results/experiments/baseline_matrix.json",
+        help="Path to input JSON results file (default: results/experiments/baseline_matrix.json).",
     )
     parser.add_argument(
         "--output-dir",
@@ -117,7 +118,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--format",
-        choices=["all", "markdown", "csv", "json"],
+        choices=["all", "markdown", "csv", "json", "latex"],
         default="all",
         help="Output format(s) to generate (default: all).",
     )
@@ -130,7 +131,7 @@ def main() -> int:
     parser.add_argument(
         "--no-ci",
         action="store_true",
-        help="Disable confidence interval formatting in Markdown output.",
+        help="Disable confidence interval formatting in Markdown/LaTeX output.",
     )
 
     args = parser.parse_args()
@@ -166,6 +167,15 @@ def main() -> int:
         print(f"Markdown report written to: {md_path}")
         print()
         print(markdown)
+
+    # LaTeX
+    if fmt in ("all", "latex"):
+        tex_path = output_dir / f"{stem}_table.tex"
+        latex = export_latex_table(report, output_path=tex_path, format_ci=not args.no_ci)
+        print(f"LaTeX report written to: {tex_path}")
+        if fmt == "latex":
+            print()
+            print(latex)
 
     # CSV
     if fmt in ("all", "csv"):

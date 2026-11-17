@@ -350,7 +350,7 @@ python scripts/audit_security_compliance.py \
   - **Description**: Build Streamlit multi-page interface. Implement Operations page displaying live transfer queue, active transfer progress bars, QKD key buffer gauges, and recent completion status.
   - **DoD**: Streamlit page loads data from API or SQLite repository without exceptions.
 
-- [ ] **TASK-6.2** (Agent D) — Research Experiment Analytics Page
+- [x] **TASK-6.2** (Agent D) — Research Experiment Analytics Page
   - **Files**: `dashboard/pages/experiments.py`, `dashboard/components/charts.py`
   - **Description**: Implement Experiments page displaying policy comparison charts (box plots of transfer duration, deadline success rate bars, throughput over time, and starvation wait time histograms).
   - **DoD**: Page visualizes benchmark results from `results/experiments/*.json`.
@@ -360,7 +360,7 @@ python scripts/audit_security_compliance.py \
   - **Description**: Build Model Evaluation page displaying duration prediction scatter plots (actual vs. predicted), MAE/RMSE metrics, and feature importance bar charts.
   - **DoD**: Streamlit page loads `joblib` model artifact and renders evaluation curves.
 
-- [ ] **TASK-6.4** (Agent D) — Statistical Reporting & Confidence Intervals Tool
+- [x] **TASK-6.4** (Agent D) — Statistical Reporting & Confidence Intervals Tool
   - **Files**: `scripts/export_results.py`, `simulation/aggregation.py`
   - **Description**: Enhance result exporter to produce publication-ready LaTeX/Markdown tables and compute 95% confidence intervals via bootstrapping.
   - **DoD**: `python scripts/export_results.py --format markdown` outputs valid markdown table with $\pm 95\%$ CI bounds.

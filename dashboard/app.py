@@ -35,22 +35,11 @@ def _render_experiments() -> None:
     render_experiments_page()
 
 
-def _render_model_evaluation_placeholder() -> None:
-    """Renders the Model Evaluation page or placeholder if not yet implemented."""
-    try:
-        import importlib
+def _render_model_evaluation() -> None:
+    """Renders the Model Evaluation & Feature Importance page (TASK-6.3)."""
+    from dashboard.pages.model_evaluation import render_model_evaluation_page
 
-        mod = importlib.import_module("dashboard.pages.model_evaluation")
-        render_fn = mod.render_model_evaluation_page
-        render_fn()
-    except (ImportError, AttributeError):
-        st.markdown("## 🤖 Predictor Performance & Feature Importance")
-        st.caption("Gradient Boosting duration estimator and residual error metrics")
-        st.info(
-            "The Predictor Performance view will be available under **Milestone 6 (TASK-6.3)**. "
-            "It renders actual-vs-predicted scatter plots, MAE/RMSE, and Gini feature importance curves.",
-            icon="ℹ️",
-        )
+    render_model_evaluation_page()
 
 
 def main() -> None:
@@ -74,7 +63,7 @@ def main() -> None:
         icon="🔬",
     )
     models_page = st.Page(
-        _render_model_evaluation_placeholder,
+        _render_model_evaluation,
         title="Model Evaluation",
         icon="🤖",
     )

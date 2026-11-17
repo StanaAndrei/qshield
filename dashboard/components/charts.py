@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from typing import Any
 
+import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -324,11 +325,178 @@ def plot_starvation_histograms(
     return apply_chart_styling(fig)
 
 
+def plot_actual_vs_predicted_scatter(
+    y_true: list[float] | np.ndarray,
+    y_pred: list[float] | np.ndarray,
+    categories: list[str] | None = None,
+) -> go.Figure:
+    """Generates duration prediction scatter plot with ideal calibration reference line.
+
+    Args:
+        y_true: Ground-truth measured transfer durations.
+        y_pred: Predicted transfer durations from ML model.
+        categories: Optional medical data category labels for color-coding.
+
+    Returns:
+        Plotly Figure showing actual vs. predicted durations.
+    """
+    yt = np.asarray(y_true, dtype=np.float64)
+    yp = np.asarray(y_pred, dtype=np.float64)
+
+    if len(yt) == 0 or len(yp) == 0:
+        fig = go.Figure()
+        fig.add_annotation(text="No prediction samples available for scatter visualization", showarrow=False)
+        return apply_chart_styling(fig, "Actual vs. Predicted Transfer Duration")
+
+    df_plot = pd.DataFrame({
+        "actual": yt,
+        "predicted": yp,
+        "absolute_error": np.abs(yt - yp),
+    })
+
+    color_col = None
+    if categories is not None and len(categories) == len(yt):
+        df_plot["category"] = categories
+        color_col = "category"
+
+    fig = px.scatter(
+        df_plot,
+        x="actual",
+        y="predicted",
+        color=color_col,
+        hover_data=["absolute_error"],
+        opacity=0.75,
+        labels={
+            "actual": "Actual Transfer Duration (seconds)",
+            "predicted": "Predicted Duration (seconds)",
+            "category": "Medical Category",
+            "absolute_error": "Absolute Error (s)",
+        },
+        title="Actual vs. Predicted Transfer Duration (Calibration Curve)",
+    )
+
+    # Reference 45-degree line y = x
+    min_val = min(float(np.min(yt)), float(np.min(yp)))
+    max_val = max(float(np.max(yt)), float(np.max(yp)))
+    padding = (max_val - min_val) * 0.05
+    line_min = max(0.0, min_val - padding)
+    line_max = max_val + padding
+
+    fig.add_trace(
+        go.Scatter(
+            x=[line_min, line_max],
+            y=[line_min, line_max],
+            mode="lines",
+            line={"color": "rgba(220, 50, 50, 0.8)", "dash": "dash", "width": 2},
+            name="Ideal Prediction (y = x)",
+        )
+    )
+
+    return apply_chart_styling(fig)
+
+
+def plot_feature_importances(
+    feature_names: list[str],
+    importances: list[float] | np.ndarray,
+    title: str | None = None,
+) -> go.Figure:
+    """Generates horizontal bar chart of feature importances sorted in descending order.
+
+    Args:
+        feature_names: List of input feature names.
+        importances: Gini impurity / MDI scores or normalized coefficients.
+        title: Optional custom chart title.
+
+    Returns:
+        Plotly Figure displaying feature importance ranking.
+    """
+    if len(feature_names) == 0 or len(importances) == 0:
+        fig = go.Figure()
+        fig.add_annotation(text="No feature importance metrics available", showarrow=False)
+        return apply_chart_styling(fig, "Predictor Feature Importance Ranking")
+
+    imp_arr = np.asarray(importances, dtype=np.float64)
+    # Normalize if values don't sum to ~1
+    total_imp = float(np.sum(np.abs(imp_arr)))
+    if total_imp > 0 and not np.isclose(total_imp, 1.0, atol=0.05):
+        norm_imp = np.abs(imp_arr) / total_imp
+    else:
+        norm_imp = imp_arr
+
+    df_imp = pd.DataFrame({
+        "feature": [f.replace("_", " ").title() for f in feature_names],
+        "importance": norm_imp,
+    })
+    # Sort ascending for horizontal bar chart (top at top)
+    df_imp = df_imp.sort_values(by="importance", ascending=True)
+
+    fig = px.bar(
+        df_imp,
+        x="importance",
+        y="feature",
+        orientation="h",
+        text=df_imp["importance"].apply(lambda v: f"{v * 100:.1f}%" if v <= 1.0 else f"{v:.2f}"),
+        color="importance",
+        color_continuous_scale="Blues",
+        labels={
+            "importance": "Relative Importance (MDI / Gini)",
+            "feature": "Input Feature",
+        },
+        title=title or "Predictor Feature Importance Ranking (Gini Impurity / MDI)",
+    )
+    fig.update_traces(textposition="outside")
+    fig.update_layout(coloraxis_showscale=False)
+    return apply_chart_styling(fig)
+
+
+def plot_residual_distribution(
+    y_true: list[float] | np.ndarray,
+    y_pred: list[float] | np.ndarray,
+) -> go.Figure:
+    """Generates histogram of prediction residuals (y - y_hat) centered around zero.
+
+    Args:
+        y_true: Ground-truth measured transfer durations.
+        y_pred: Predicted transfer durations from ML model.
+
+    Returns:
+        Plotly Figure showing residual error distribution.
+    """
+    yt = np.asarray(y_true, dtype=np.float64)
+    yp = np.asarray(y_pred, dtype=np.float64)
+
+    if len(yt) == 0 or len(yp) == 0:
+        fig = go.Figure()
+        fig.add_annotation(text="No prediction residuals available", showarrow=False)
+        return apply_chart_styling(fig, "Residual Error Distribution")
+
+    residuals = yt - yp
+    df_res = pd.DataFrame({"residual": residuals})
+
+    fig = px.histogram(
+        df_res,
+        x="residual",
+        marginal="box",
+        nbins=40,
+        opacity=0.75,
+        color_discrete_sequence=["#AB63FA"],
+        labels={"residual": "Residual Error (seconds, Actual - Predicted)"},
+        title="Duration Prediction Residual Error Distribution (s)",
+    )
+
+    # Vertical line at zero error
+    fig.add_vline(x=0.0, line_dash="dash", line_color="red", annotation_text="Zero Error")
+    return apply_chart_styling(fig)
+
+
 __all__ = [
     "POLICY_COLOR_MAP",
     "apply_chart_styling",
+    "plot_actual_vs_predicted_scatter",
     "plot_deadline_success_bars",
     "plot_duration_boxplots",
+    "plot_feature_importances",
+    "plot_residual_distribution",
     "plot_starvation_histograms",
     "plot_throughput_over_time",
 ]

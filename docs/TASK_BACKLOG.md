@@ -355,7 +355,7 @@ python scripts/audit_security_compliance.py \
   - **Description**: Implement Experiments page displaying policy comparison charts (box plots of transfer duration, deadline success rate bars, throughput over time, and starvation wait time histograms).
   - **DoD**: Page visualizes benchmark results from `results/experiments/*.json`.
 
-- [ ] **TASK-6.3** (Agent E) — Predictor Performance & Feature Importance View
+- [x] **TASK-6.3** (Agent E) — Predictor Performance & Feature Importance View
   - **Files**: `dashboard/pages/model_evaluation.py`
   - **Description**: Build Model Evaluation page displaying duration prediction scatter plots (actual vs. predicted), MAE/RMSE metrics, and feature importance bar charts.
   - **DoD**: Streamlit page loads `joblib` model artifact and renders evaluation curves.

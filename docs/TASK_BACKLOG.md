@@ -365,7 +365,7 @@ python scripts/audit_security_compliance.py \
   - **Description**: Enhance result exporter to produce publication-ready LaTeX/Markdown tables and compute 95% confidence intervals via bootstrapping.
   - **DoD**: `python scripts/export_results.py --format markdown` outputs valid markdown table with $\pm 95\%$ CI bounds.
 
-- [ ] **TASK-6.5** (Agent A) — End-to-End Pitch Demonstration Script
+- [x] **TASK-6.5** (Agent A) — End-to-End Pitch Demonstration Script
   - **Files**: `scripts/run_demonstration.py`
   - **Description**: Build interactive pitch demonstration scenario simulating University-Polyclinic exchange: executes the 3-tier workload (5 MB report, 2 GB MRI scan, 500 MB dataset), injects a simulated network drop/QKD depletion, demonstrates retry/recovery, and displays policy comparison summary.
   - **DoD**: `python scripts/run_demonstration.py --scenario configs/scenarios/medical_mixed_workload.yaml` executes cleanly and outputs formatted demonstration summary.

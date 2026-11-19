@@ -370,7 +370,7 @@ python scripts/audit_security_compliance.py \
   - **Description**: Build interactive pitch demonstration scenario simulating University-Polyclinic exchange: executes the 3-tier workload (5 MB report, 2 GB MRI scan, 500 MB dataset), injects a simulated network drop/QKD depletion, demonstrates retry/recovery, and displays policy comparison summary.
   - **DoD**: `python scripts/run_demonstration.py --scenario configs/scenarios/medical_mixed_workload.yaml` executes cleanly and outputs formatted demonstration summary.
 
-- [ ] **TASK-6.6** (Agent G) — System-Wide Integration Tests & Acceptance Gate
+- [x] **TASK-6.6** (Agent G) — System-Wide Integration Tests & Acceptance Gate
   - **Files**: `tests/integration/test_dashboard_data.py`, full test suite execution
   - **Description**: Test dashboard data aggregation queries headlessly. Execute complete test suite verifying zero regressions across all modules.
   - **DoD**: All unit, integration, simulation, and security test suites pass.

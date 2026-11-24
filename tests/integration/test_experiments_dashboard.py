@@ -17,9 +17,34 @@ from dashboard.components.charts import (
 from dashboard.pages.experiments import (
     _extract_records_dataframe,
     _load_experiment_data,
+    _comparison_rows,
     _reconstruct_report,
     render_experiments_page,
 )
+
+
+def test_ai_vs_heuristic_payload_is_normalized_for_dashboard() -> None:
+    payload = {
+        "scenario_name": "medical_mixed_workload",
+        "seeds": [1, 2],
+        "predictor_version": "v1",
+        "predictor_evaluation": {"mae": 0.1, "rmse": 0.2, "r2": 0.9, "count": 20},
+        "comparison": {
+            "deadline_success_rate": {"heuristic": 0.8, "ai_assisted": 0.9, "absolute_gain": 0.1},
+            "mean_duration_seconds": {"heuristic": 2.0, "ai_assisted": 1.5, "relative_change": -0.25},
+            "p95_duration_seconds": {"heuristic": 4.0, "ai_assisted": 3.0},
+            "mean_throughput_mbps": {"heuristic": 90.0, "ai_assisted": 100.0, "relative_change": 0.11},
+            "mean_queue_wait_seconds": {"heuristic": 0.4, "ai_assisted": 0.2},
+        },
+    }
+
+    records = _extract_records_dataframe(payload)
+    comparison = _comparison_rows(payload)
+
+    assert records["policy_name"].tolist() == ["RESOURCE_AWARE_HEURISTIC", "AI_ASSISTED"]
+    assert records["total_duration_seconds"].tolist() == [2.0, 1.5]
+    assert comparison["Deadline Success Rate"].tolist() == [0.8, 0.9]
+    assert _reconstruct_report(payload) is None  # no run-level samples to form confidence intervals
 
 
 @pytest.fixture

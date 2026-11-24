@@ -26,7 +26,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from app.predictor.evaluate import compute_metrics, extract_features_from_record
 from app.predictor.model_registry import ModelRegistry
-from simulation.aggregation import ResultAggregator
+from simulation.aggregation import ResultAggregator, _result_to_dict, _summary_to_dict
 from simulation.engine import EngineConfig, SimulationEngine, SimulationResult
 from simulation.key_resource_model import KeyResourceConfig
 from simulation.network_model import NetworkConfig
@@ -196,8 +196,24 @@ def main() -> int:
     payload = {
         "scenario_name": scenario_path.stem,
         "seeds": seed_list,
+        "total_runs": len(heuristic_results) + len(ai_results),
         "predictor_version": predictor.get_model_version(),
         "predictor_evaluation": pred_metrics.to_dict(),
+        # Keep each policy's run and transfer-level observations so the
+        # experiment dashboard can render the same distributions as the
+        # baseline matrix export.
+        "runs": [_result_to_dict(result) for result in heuristic_results + ai_results],
+        "aggregate": {
+            "scenario_name": scenario_path.stem,
+            "total_runs": len(heuristic_results) + len(ai_results),
+            "policies": ["RESOURCE_AWARE_HEURISTIC", "AI_ASSISTED"],
+            "seeds": seed_list,
+            "summaries": {
+                **{name: _summary_to_dict(summary) for name, summary in report_heur.summaries.items()},
+                **{name: _summary_to_dict(summary) for name, summary in report_ai.summaries.items()},
+            },
+            "relative_improvements": {},
+        },
         "comparison": {
             "deadline_success_rate": {
                 "heuristic": round(sum_heur.deadline_success_rate, 4),

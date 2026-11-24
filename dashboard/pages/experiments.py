@@ -94,6 +94,25 @@ def _extract_records_dataframe(data: dict[str, Any]) -> pd.DataFrame:
                 "completion_time": 10.0,
             })
 
+    # AI-vs-heuristic reports intentionally contain aggregates rather than the
+    # individual simulation records written by run_experiments.py.
+    if not records_list and isinstance(data.get("comparison"), dict):
+        comparison = data["comparison"]
+        for policy_key, policy_name in (("heuristic", "RESOURCE_AWARE_HEURISTIC"), ("ai_assisted", "AI_ASSISTED")):
+            records_list.append({
+                "policy_name": policy_name,
+                "seed": "aggregate",
+                "scenario_name": data.get("scenario_name", "unknown"),
+                "total_duration_seconds": comparison.get("mean_duration_seconds", {}).get(policy_key, 0.0),
+                "transfer_duration_seconds": comparison.get("mean_duration_seconds", {}).get(policy_key, 0.0),
+                "p95_duration_seconds": comparison.get("p95_duration_seconds", {}).get(policy_key, 0.0),
+                "queue_time": comparison.get("mean_queue_wait_seconds", {}).get(policy_key, 0.0),
+                "actual_throughput_mbps": comparison.get("mean_throughput_mbps", {}).get(policy_key, 0.0),
+                "deadline_success_rate": comparison.get("deadline_success_rate", {}).get(policy_key, 0.0),
+                "deadline_met": comparison.get("deadline_success_rate", {}).get(policy_key, 0.0) >= 0.5,
+                "completion_time": 1.0,
+            })
+
     return pd.DataFrame(records_list)
 
 
@@ -214,6 +233,25 @@ def _reconstruct_report(data: dict[str, Any]) -> AggregationReport | None:
     return aggregator.aggregate(results)
 
 
+def _comparison_rows(data: dict[str, Any]) -> pd.DataFrame:
+    """Normalize the compact AI-vs-heuristic comparison payload for display."""
+    comparison = data.get("comparison")
+    if not isinstance(comparison, dict):
+        return pd.DataFrame()
+
+    rows = []
+    for key, label in (("heuristic", "RESOURCE_AWARE_HEURISTIC"), ("ai_assisted", "AI_ASSISTED")):
+        rows.append({
+            "Policy": label,
+            "Deadline Success Rate": comparison.get("deadline_success_rate", {}).get(key),
+            "Mean Duration (s)": comparison.get("mean_duration_seconds", {}).get(key),
+            "P95 Duration (s)": comparison.get("p95_duration_seconds", {}).get(key),
+            "Mean Throughput (Mbps)": comparison.get("mean_throughput_mbps", {}).get(key),
+            "Mean Queue Wait (s)": comparison.get("mean_queue_wait_seconds", {}).get(key),
+        })
+    return pd.DataFrame(rows)
+
+
 def render_experiments_page() -> None:
     """Renders the comprehensive Research Experiment Analytics page."""
     # -------------------------------------------------------------------------
@@ -277,6 +315,7 @@ def render_experiments_page() -> None:
     # Extract records and statistical report
     df_records = _extract_records_dataframe(raw_data)
     report = _reconstruct_report(raw_data)
+    comparison_df = _comparison_rows(raw_data)
 
     # -------------------------------------------------------------------------
     # KPI Metric Cards
@@ -285,7 +324,7 @@ def render_experiments_page() -> None:
     c1, c2, c3, c4, c5 = st.columns(5)
 
     scenario_label = report.scenario_name if report else raw_data.get("scenario_name", "medical_mixed_workload")
-    total_runs = report.total_runs if report else len(raw_data.get("runs", []))
+    total_runs = report.total_runs if report else len(raw_data.get("runs", [])) or len(raw_data.get("seeds", []))
     policies_list = report.policies if report else list(df_records["policy_name"].unique()) if not df_records.empty else []
     total_records = len(df_records) if not df_records.empty else 0
     seeds_count = len(report.seeds) if (report and report.seeds) else len(raw_data.get("seeds", [1]))
@@ -300,6 +339,22 @@ def render_experiments_page() -> None:
         st.metric(label="📊 Simulated Requests", value=f"{total_records:,}")
     with c5:
         st.metric(label="🎲 Independent Seeds", value=f"{seeds_count}")
+
+    if not comparison_df.empty:
+        st.subheader("🤖 AI-Assisted vs Heuristic Comparison")
+        st.caption(
+            f"Predictor: {raw_data.get('predictor_version', 'N/A')} · "
+            f"Seeds: {', '.join(map(str, raw_data.get('seeds', []))) or 'N/A'}"
+        )
+        st.dataframe(comparison_df, use_container_width=True, hide_index=True)
+        predictor_eval = raw_data.get("predictor_evaluation")
+        if isinstance(predictor_eval, dict):
+            st.markdown("**Predictor evaluation**")
+            eval_cols = st.columns(4)
+            for col, (label, key) in zip(eval_cols, (("MAE (s)", "mae"), ("RMSE (s)", "rmse"), ("R²", "r2"), ("Samples", "count"))):
+                value = predictor_eval.get(key)
+                with col:
+                    st.metric(label, f"{value:,}" if key == "count" and value is not None else f"{value:.4f}" if isinstance(value, (int, float)) else "N/A")
 
     # -------------------------------------------------------------------------
     # Filtering Controls
@@ -373,6 +428,10 @@ def render_experiments_page() -> None:
                         })
                 if rel_rows:
                     st.dataframe(pd.DataFrame(rel_rows), use_container_width=True, hide_index=True)
+    elif not comparison_df.empty:
+        st.info("This file contains aggregate AI-vs-heuristic results. The comparison table above shows the available policy metrics; run-level confidence intervals are not included in this export.")
+    else:
+        st.info("This file does not contain run-level records or aggregate summaries to build the statistical matrix.")
 
     # -------------------------------------------------------------------------
     # Visual Analytics Tabs

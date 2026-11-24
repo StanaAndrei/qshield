@@ -13,8 +13,6 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-import pytest
-
 # ---------------------------------------------------------------------------
 # Ensure project root is importable regardless of invocation CWD
 # ---------------------------------------------------------------------------
@@ -141,9 +139,9 @@ class TestDemonstrationPhases:
 
     def test_phase1_tier_walkthrough(self) -> None:
         """Phase 1 returns a DemoPhaseResult with 3 transfer records."""
-        from simulation.scenarios import load_scenario
-        from simulation.key_resource_model import KeyResourceConfig, KeyResourceModel
         from scripts.run_demonstration import _phase1_tier_walkthrough
+        from simulation.key_resource_model import KeyResourceConfig
+        from simulation.scenarios import load_scenario
 
         scenario = load_scenario(_SCENARIO_PATH)
         key_config = KeyResourceConfig(
@@ -165,9 +163,9 @@ class TestDemonstrationPhases:
 
     def test_phase2_fault_injection(self) -> None:
         """Phase 2 returns a DemoPhaseResult with at least 4 events."""
-        from simulation.scenarios import load_scenario
-        from simulation.key_resource_model import KeyResourceConfig
         from scripts.run_demonstration import _phase2_fault_injection
+        from simulation.key_resource_model import KeyResourceConfig
+        from simulation.scenarios import load_scenario
 
         scenario = load_scenario(_SCENARIO_PATH)
         key_config = KeyResourceConfig(
@@ -190,9 +188,9 @@ class TestDemonstrationPhases:
 
     def test_phase3_policy_comparison(self) -> None:
         """Phase 3 returns simulation results for all requested policies."""
-        from simulation.scenarios import load_scenario
-        from simulation.key_resource_model import KeyResourceConfig
         from scripts.run_demonstration import _phase3_policy_comparison
+        from simulation.key_resource_model import KeyResourceConfig
+        from simulation.scenarios import load_scenario
 
         scenario = load_scenario(_SCENARIO_PATH)
         key_config = KeyResourceConfig(

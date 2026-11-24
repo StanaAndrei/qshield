@@ -23,7 +23,7 @@ import argparse
 import sys
 import time
 from dataclasses import dataclass, field
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -35,12 +35,11 @@ if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
 
 from app.core.enums import DataCategory, PriorityLevel
-from simulation.engine import EngineConfig, SimulationEngine, SimulationResult, TransferRecord
+from simulation.engine import EngineConfig, SimulationEngine, SimulationResult
 from simulation.key_resource_model import KeyResourceConfig, KeyResourceModel
 from simulation.network_model import NetworkConfig, NetworkModel
 from simulation.scenarios import load_scenario
-from simulation.workload_generator import WorkloadConfig, WorkloadGenerator
-
+from simulation.workload_generator import WorkloadConfig
 
 # ---------------------------------------------------------------------------
 # ANSI colour helpers (gracefully degraded when not in a TTY)
@@ -314,7 +313,7 @@ def _phase2_fault_injection(
         print(f"  {_c('⚠  FAULT EVENT 1: Network Outage Simulated', _BOLD, _RED)}")
         print(f"     Throughput reduced: {net_config.baseline_throughput_mbps:.0f} Mbps → 5 Mbps")
         print(f"     RTT inflated: {net_config.rtt_ms:.0f} ms → {net_config.rtt_ms * 10:.0f} ms")
-        print(f"     Packet drop probability: 0.1% → 80%")
+        print("     Packet drop probability: 0.1% → 80%")
         print()
 
     sample_drop = degraded_net.sample(simulation_time=5.0)
@@ -499,7 +498,7 @@ def _build_markdown_report(
     lines.append("")
     lines.append(f"**Generated:** {now_str}  ")
     lines.append(f"**Scenario:** `{scenario_name}`  ")
-    lines.append(f"**Script:** `python scripts/run_demonstration.py`")
+    lines.append("**Script:** `python scripts/run_demonstration.py`")
     lines.append("")
 
     # ------- Phase 1 -------

@@ -268,8 +268,9 @@ python scripts/audit_security_compliance.py \
 Launch the web-based operations and research visualization platform:
 
 ```bash
-streamlit run dashboard/app.py
+streamlit run dashboard/streamlit_app.py
 ```
+
 Default URL: [http://localhost:8501](http://localhost:8501)
 
 **Dashboard Pages:**

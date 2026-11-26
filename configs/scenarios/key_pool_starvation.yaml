@@ -1,0 +1,64 @@
+# Q-SHIELD Key Pool Starvation Scenario
+# Deliberately starts with a small key buffer and slow replenishment so
+# concurrent transfers regularly wait for QKD keys.
+
+version: "1.0.0"
+scenario_name: "key_pool_starvation"
+description: >
+  Stress scenario for QKD key pool depletion. A small initial pool and low
+  generation rate are paired with a busy medical workload to exercise key
+  acquisition waits and their effect on transfer completion and deadlines.
+
+seed: 42
+workload_size: 100
+
+policies:
+  - FIFO
+  - PRIORITY
+  - RESOURCE_AWARE_HEURISTIC
+
+network:
+  source_id: "univ-lab"
+  destination_id: "poly-clinic"
+  throughput_mbps: 100.0
+  throughput_std_mbps: 15.0
+  round_trip_time_ms: 10.0
+  packet_loss_rate: 0.001
+  min_throughput_mbps: 5.0
+
+key_resource:
+  initial_keys: 5
+  buffer_ceiling: 10
+  generation_rate_keys_per_second: 0.05
+  keys_per_transfer: 1
+
+arrival_rate_per_second: 0.5
+
+priority_distribution:
+  LOW: 0.20
+  NORMAL: 0.40
+  HIGH: 0.30
+  CRITICAL: 0.10
+
+category_distribution:
+  DIAGNOSTIC_REPORT: 0.40
+  MEDICAL_IMAGE: 0.30
+  RESEARCH_DATASET: 0.20
+  TELEMETRY_LOG: 0.10
+
+data_size_distribution:
+  min_bytes: 1000000
+  max_bytes: 500000000
+  distribution: "pareto"
+  pareto_alpha: 1.5
+
+deadline:
+  fraction_with_deadline: 0.60
+  slack_multiplier_min: 1.0
+  slack_multiplier_max: 5.0
+
+heuristic_overrides:
+  weight_priority: 2.0
+  weight_slack: 0.01
+  weight_aging: 0.05
+  max_consecutive_high_priority: 5

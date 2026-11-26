@@ -209,6 +209,15 @@ python scripts/export_results.py \
 - Utilizes Python multiprocessing to isolate seed executions across multiple CPU workers.
 - Generates statistical summaries (mean, median, IQR, 95th percentile completion times, deadline success rates).
 
+Another options:
+```bash
+python scripts/run_experiments.py \
+  --scenario configs/scenarios/key_pool_starvation.yaml \
+  --sequential \
+  --seeds 1 \
+  --output results/experiments/key_pool_starvation.json
+```
+
 ---
 
 ### Step 6: Train and Evaluate the AI Predictor Model

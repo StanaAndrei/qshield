@@ -1,0 +1,50 @@
+{
+  "model_type": "random_forest",
+  "model_version": "random_forest-v1.0.0",
+  "feature_names": [
+    "data_size_bytes",
+    "priority_level",
+    "queue_length",
+    "active_transfer_count",
+    "recent_throughput_mbps",
+    "throughput_mean",
+    "throughput_std",
+    "deadline_slack_seconds",
+    "link_status_connected",
+    "recent_failure_rate",
+    "estimated_available_bandwidth_mbps",
+    "key_service_latency_ms",
+    "key_resource_level",
+    "key_replenishment_rate_bps",
+    "has_qkd_metrics"
+  ],
+  "train_metrics": {
+    "mae": 0.0033,
+    "rmse": 0.0159,
+    "r2": 0.9981,
+    "count": 1200
+  },
+  "test_metrics": {
+    "mae": 0.0088,
+    "rmse": 0.0214,
+    "r2": 0.9922,
+    "count": 300
+  },
+  "cv_mean_r2": 0.9875,
+  "cv_mean_rmse": 0.0398,
+  "test_seed": 4,
+  "train_seeds": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "hyperparameters": {
+    "n_estimators": 100,
+    "max_depth": 10,
+    "min_samples_split": 4,
+    "random_state": 42,
+    "n_jobs": -1
+  },
+  "saved_at": "2026-11-25T20:43:56.178314+00:00"
+}

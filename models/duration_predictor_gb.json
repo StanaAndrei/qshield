@@ -1,0 +1,50 @@
+{
+  "model_type": "gradient_boosting",
+  "model_version": "gradient_boosting-v1.0.0",
+  "feature_names": [
+    "data_size_bytes",
+    "priority_level",
+    "queue_length",
+    "active_transfer_count",
+    "recent_throughput_mbps",
+    "throughput_mean",
+    "throughput_std",
+    "deadline_slack_seconds",
+    "link_status_connected",
+    "recent_failure_rate",
+    "estimated_available_bandwidth_mbps",
+    "key_service_latency_ms",
+    "key_resource_level",
+    "key_replenishment_rate_bps",
+    "has_qkd_metrics"
+  ],
+  "train_metrics": {
+    "mae": 0.0019,
+    "rmse": 0.0029,
+    "r2": 0.9999,
+    "count": 1200
+  },
+  "test_metrics": {
+    "mae": 0.0069,
+    "rmse": 0.0182,
+    "r2": 0.9944,
+    "count": 300
+  },
+  "cv_mean_r2": 0.9992,
+  "cv_mean_rmse": 0.0088,
+  "test_seed": 4,
+  "train_seeds": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "hyperparameters": {
+    "n_estimators": 120,
+    "learning_rate": 0.08,
+    "max_depth": 4,
+    "min_samples_split": 4,
+    "random_state": 42
+  },
+  "saved_at": "2026-11-25T20:44:07.756932+00:00"
+}

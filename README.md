@@ -133,6 +133,18 @@ python scripts/verify_tracer_bullet.py \
 - Generates a synthetic medical buffer, queries the QKD key resource adapter, and executes transport.
 - Computes SHA-256 checksums to verify payload integrity and transitions status to `COMPLETED`.
 
+This is a local synthetic transfer walkthrough; it does not send data over a physical network or use physical QKD hardware. See all available options with:
+
+```bash
+python scripts/verify_tracer_bullet.py --help
+```
+
+Use `--simulate-failure` to deliberately alter the received synthetic payload and demonstrate checksum failure handling.
+
+#### QKD adapter status
+
+The adapter interface is defined in `app/qkd/base.py`. `app/qkd/simulator.py` provides the simulated key-buffer adapter used for development and experiments. `app/qkd/real_adapter.py` contains an ETSI GS QKD 014 REST client that requires an authorized KME endpoint and credentials or mTLS certificates. The application does not currently select an adapter through a shared setting: the dashboard metrics instantiate the simulator directly, and the tracer bullet uses a synthetic transfer path. Therefore, changing a config value or selecting the real adapter in the UI will not switch the whole app to physical QKD; that requires wiring the adapter into the services that use QKD. Do not put hardware credentials in source control.
+
 ---
 
 ### Step 3: Run the REST API Service
@@ -222,7 +234,7 @@ python scripts/run_experiments.py \
 
 ### Step 6: Train and Evaluate the AI Predictor Model
 
-Train a Gradient Boosting / Random Forest regressor to predict transfer duration and deadline-miss probability:
+Train a transfer-duration regressor. The CLI supports `ridge`, `random_forest`, and `gradient_boosting`:
 
 ```bash
 # 1. Train the duration prediction model
@@ -243,6 +255,31 @@ python scripts/evaluate_policy_gain.py \
     --seeds 5 \
     --output results/experiments/ai_vs_heuristic.json
 ```
+
+Train another supported model by changing `--model-type` and saving it to a separate artifact path. For example:
+
+```bash
+python scripts/train_model.py \
+    --data results/experiments/baseline_matrix.json \
+    --model-type ridge \
+    --output models/duration_predictor_ridge.joblib
+
+python scripts/train_model.py \
+    --data results/experiments/baseline_matrix.json \
+    --model-type random_forest \
+    --output models/duration_predictor_rf.joblib
+```
+
+Then pass the chosen artifact to `evaluate_policy_gain.py` with `--model` and choose a distinct `--output` filename for each result. That script currently compares AI-Assisted scheduling to `RESOURCE_AWARE_HEURISTIC`; direct AI-vs-FIFO comparison is not currently a supported option. Its `--help` output lists the available arguments:
+
+```bash
+python scripts/train_model.py --help
+python scripts/evaluate_policy_gain.py --help
+python scripts/run_experiments.py --help
+python -m app.predictor.evaluate --help
+```
+
+The comparison JSON includes per-seed simulation runs and individual transfer records as well as aggregate metrics, so the Experiments dashboard can display distributions and confidence intervals. Increase `--seeds` to run more independent workloads (for example, `--seeds 50`); each seed runs both the heuristic and AI policies.
 
 *What this does:*
 - Extracts normalized feature vectors (payload size, queue depth, rolling network throughput, QKD key buffer levels).
